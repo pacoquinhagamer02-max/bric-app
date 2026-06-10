@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#8b5cf6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Bric">
+<title>Bric — Compras & Vendas</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+
+<style>
+:root {
+  --p: #8b5cf6;
+  --p2: #7c3aed;
+  --cyan: #06b6d4;
+  --green: #10b981;
+  --green2: #059669;
+  --red: #ef4444;
+  --red2: #dc2626;
+  --gold: #f59e0b;
+  --bg: #0a0a0f;
+  --bg2: #13131f;
+  --bg3: #1a1a2e;
+  --bg4: #1e1e35;
+  --border: rgba(139,92,246,0.15);
+  --border2: rgba(255,255,255,0.07);
+  --text: #f0f0ff;
+  --text2: #8888aa;
+  --text3: #555577;
+  --r: 18px;
+  --r2: 14px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.5);
+  --shadow-p: 0 8px 24px rgba(139,92,246,0.35);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+  background:var(--bg);color:var(--text);
+  min-height:100vh;min-height:100dvh;
+  padding-bottom:calc(72px + env(safe-area-inset-bottom));
+  overflow-x:hidden;
+}
+button,input,select,textarea{font-family:inherit}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--p);border-radius:4px}
+
+/* HEADER */
+.header{
+  position:sticky;top:0;z-index:80;
+  background:rgba(10,10,15,0.85);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border2);
+  padding:0 20px;
+  padding-top:env(safe-area-inset-top);
+}
+.header-inner{
+  max-width:640px;margin:0 auto;
+  height:56px;display:flex;align-items:center;justify-content:space-between;
+}
+.logo{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:900;letter-spacing:-0.5px}
+.logo-icon{
+  width:34px;height:34px;border-radius:10px;
+  background:linear-gradient(135deg,var(--p),var(--cyan));
+  display:flex;align-items:center;justify-content:center;font-size:17px;
+}
+.header-btns{display:flex;gap:6px}
+.hbtn{
+  width:36px;height:36px;border-radius:10px;border:1px solid var(--border2);
+  background:var(--bg3);color:var(--text2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+  transition:all .2s;
+}
+.hbtn:hover,.hbtn.active{background:var(--p);border-color:var(--p);color:#fff}
+
+/* MAIN */
+main{max-width:640px;margin:0 auto;padding:20px 16px 8px}
+
+/* UPDATE BANNER */
+.update-banner{
+  background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(6,182,212,.2));
+  border:1px solid var(--p);border-radius:var(--r2);
+  padding:12px 16px;margin-bottom:16px;
+  display:none;align-items:center;gap:12px;cursor:pointer;
+}
+.update-banner.show{display:flex}
+.update-banner-text{flex:1;font-size:13px;font-weight:600}
+.update-btn{
+  background:var(--p);border:none;border-radius:8px;color:#fff;
+  padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;
+  white-space:nowrap;
+}
+
+/* SYNC BANNER */
+.sync-bar{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 12px;border-radius:10px;margin-bottom:16px;
+  font-size:12px;font-weight:600;
+  background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);
+  color:var(--green);
+  opacity:0;transition:opacity .3s;
+}
+.sync-bar.show{opacity:1}
+.sync-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 6px var(--green);
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.3)}}
+.sync-bar.offline{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.25);color:var(--red)}
+.sync-bar.offline .sync-dot{background:var(--red);box-shadow:0 0 6px var(--red);animation:none}
+
+/* TABS / BOTTOM NAV */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:80;
+  background:rgba(10,10,15,0.92);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-top:1px solid var(--border2);
+  padding:8px 0 calc(8px + env(safe-area-inset-bottom));
+  display:flex;
+}
+.nav-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  gap:3px;cursor:pointer;padding:4px 0;
+  transition:all .2s;
+}
+.nav-icon{font-size:20px;transition:transform .2s}
+.nav-label{font-size:10px;font-weight:600;color:var(--text3);transition:color .2s}
+.nav-item.active .nav-icon{transform:scale(1.15)}
+.nav-item.active .nav-label{color:var(--p)}
+
+/* PAGES */
+.page{display:none}
+.page.active{display:block;animation:fadeUp .25s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ========== DASHBOARD ========== */
+.profit-card{
+  background:linear-gradient(135deg,var(--p2) 0%,#4f46e5 50%,var(--cyan) 100%);
+  border-radius:22px;padding:24px;margin-bottom:16px;
+  position:relative;overflow:hidden;
+}
+.profit-card::before{
+  content:'';position:absolute;top:-40px;right:-40px;
+  width:160px;height:160px;
+  background:rgba(255,255,255,0.06);border-radius:50%;
+}
+.profit-card::after{
+  content:'';position:absolute;bottom:-60px;left:-20px;
+  width:200px;height:200px;
+  background:rgba(255,255,255,0.04);border-radius:50%;
+}
+.profit-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:.7}
+.profit-value{font-size:42px;font-weight:900;letter-spacing:-2px;margin:6px 0 2px;line-height:1}
+.profit-sub{font-size:13px;opacity:.7}
+.profit-trend{
+  position:absolute;top:20px;right:20px;
+  background:rgba(255,255,255,0.15);
+  border-radius:10px;padding:6px 10px;
+  font-size:12px;font-weight:700;
+}
+
+.mini-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.mini-card{
+  background:var(--bg2);border:1px solid var(--border2);
+  border-radius:var(--r2);padding:16px;
+  position:relative;overflow:hidden;transition:transform .2s;
+}
+.mini-card:hover{transform:translateY(-2px)}
+.mini-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  border-radius:var(--r2) var(--r2) 0 0;
+}
+.mini-card.green::before{background:linear-gradient(90deg,var(--green),#6ee7b7)}
+.mini-card.red::before{background:linear-gradient(90deg,var(--red),#fca5a5)}
+.mini-card.blue::before{background:linear-gradient(90deg,#3b82f6,#93c5fd)}
+.mini-card.gold::before{background:linear-gradient(90deg,var(--gold),#fde68a)}
+.mc-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text2);margin-bottom:8px}
+.mc-value{font-size:22px;font-weight:800;letter-spacing:-1px}
+.mini-card.green .mc-value{color:var(--green)}
+.mini-card.red .mc-value{color:var(--red)}
+.mini-card.blue .mc-value{color:#3b82f6}
+.mini-card.gold .mc-value{color:var(--gold)}
+.mc-sub{font-size:11px;color:var(--text2);margin-top:4px}
+
+/* CHART */
+.chart-card{
+  background:var(--bg2);border:1px solid var(--border2);
+  border-radius:var(--r);padding:18px;margin-bottom:16px;
+}
+.chart-card-header{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:16px;
+}
+.chart-card-title{font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
+.chart-tabs{display:flex;gap:4px}
+.chart-tab{
+  padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;
+  cursor:pointer;color:var(--text2);background:var(--bg3);
+  border:1px solid var(--border2);transition:all .2s;
+}
+.chart-tab.active{background:var(--p);border-color:var(--p);color:#fff}
+
+.bar-chart{
+  display:flex;align-items:flex-end;gap:6px;height:100px;overflow-x:auto;
+  padding-bottom:2px;scrollbar-width:none;
+}
+.bar-chart::-webkit-scrollbar{display:none}
+.bar-group{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  min-width:36px;flex-shrink:0;flex:1;
+}
+.bars{display:flex;align-items:flex-end;gap:2px;height:80px}
+.bar{width:11px;border-radius:3px 3px 0 0;transition:height .6s cubic-bezier(.34,1.56,.64,1);min-height:2px}
+.bar.v{background:linear-gradient(to top,var(--green),#6ee7b7)}
+.bar.c{background:linear-gradient(to top,var(--red),#fca5a5)}
+.bar-lbl{font-size:9px;color:var(--text3)}
+
+.chart-legend{display:flex;gap:14px;margin-top:12px}
+.c-leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)}
+.c-dot{width:8px;height:8px;border-radius:2px}
+
+/* RECENT SECTION */
+.section-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.section-title{font-size:14px;font-weight:800;letter-spacing:-.2px}
+.see-all{font-size:12px;color:var(--p);font-weight:600;cursor:pointer;background:none;border:none}
+
+/* ========== TRANSACTION CARDS ========== */
+.tx-list{display:flex;flex-direction:column;gap:8px}
+.tx-card{
+  background:var(--bg2);border:1px solid var(--border2);
+  border-radius:var(--r2);padding:12px 14px;
+  display:flex;align-items:center;gap:12px;
+  transition:all .2s;animation:fadeUp .3s ease;
+  position:relative;overflow:hidden;
+}
+.tx-card:hover{border-color:var(--border);transform:translateX(2px)}
+.tx-card::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:4px 0 0 4px;
+}
+.tx-card.v::before{background:var(--green)}
+.tx-card.c::before{background:var(--red)}
+.tx-thumb{
+  width:48px;height:48px;border-radius:12px;
+  object-fit:cover;background:var(--bg3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;overflow:hidden;
+}
+.tx-thumb img{width:100%;height:100%;object-fit:cover;border-radius:12px}
+.tx-body{flex:1;min-width:0}
+.tx-name{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-meta{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-top:3px}
+.badge{
+  font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;
+  text-transform:uppercase;letter-spacing:.6px;
+}
+.badge.v{background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.3)}
+.badge.c{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.tx-date,.tx-cat{font-size:10px;color:var(--text2)}
+.tx-cat{background:var(--bg3);padding:1px 6px;border-radius:5px}
+.tx-note{font-size:11px;color:var(--text2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-price{font-size:16px;font-weight:900;flex-shrink:0;text-align:right}
+.tx-price.v{color:var(--green)}
+.tx-price.c{color:var(--red)}
+.tx-sign{font-size:11px;opacity:.7}
+.tx-actions{
+  display:flex;flex-direction:column;gap:3px;flex-shrink:0;margin-left:4px;
+  opacity:0;transition:opacity .2s;
+}
+.tx-card:hover .tx-actions{opacity:1}
+.act-btn{
+  width:26px;height:26px;border-radius:7px;border:1px solid var(--border2);
+  background:var(--bg3);color:var(--text2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:12px;
+  transition:all .15s;
+}
+.act-btn:hover.del{background:var(--red);border-color:var(--red);color:#fff}
+.act-btn:hover.edt{background:var(--p);border-color:var(--p);color:#fff}
+
+/* Empty state */
+.empty{
+  text-align:center;padding:48px 20px;color:var(--text2);
+}
+.empty-emoji{font-size:48px;margin-bottom:14px;opacity:.5}
+.empty-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px}
+.empty-sub{font-size:13px;line-height:1.5}
+
+/* ========== TRANSACTIONS PAGE ========== */
+.filter-bar{
+  display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;
+  padding-bottom:4px;scrollbar-width:none;
+}
+.filter-bar::-webkit-scrollbar{display:none}
+.fbtn{
+  padding:7px 14px;border-radius:20px;border:1.5px solid var(--border2);
+  background:var(--bg2);color:var(--text2);font-size:12px;font-weight:700;
+  cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .2s;
+}
+.fbtn.on{background:var(--p);border-color:var(--p);color:#fff}
+.fbtn.on.v{background:var(--green);border-color:var(--green)}
+.fbtn.on.c{background:var(--red);border-color:var(--red)}
+.search-wrap{position:relative;margin-bottom:12px}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none}
+.search-inp{
+  width:100%;background:var(--bg2);border:1.5px solid var(--border2);
+  border-radius:10px;color:var(--text);padding:10px 12px 10px 36px;
+  font-size:13px;outline:none;transition:border-color .2s;
+}
+.search-inp:focus{border-color:var(--p)}
+.search-inp::placeholder{color:var(--text3)}
+
+/* Sort */
+.sort-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sort-label{font-size:11px;color:var(--text2);font-weight:600}
+.sort-select{
+  background:var(--bg2);border:1px solid var(--border2);color:var(--text);
+  border-radius:7px;padding:4px 8px;font-size:11px;outline:none;cursor:pointer;
+}
+
+/* ========== GRAPHS PAGE ========== */
+.graph-section{margin-bottom:20px}
+.g-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text2);margin-bottom:12px}
+
+/* Donut chart simulation */
+.donut-wrap{display:flex;align-items:center;gap:20px;padding:8px 0}
+.donut{
+  width:100px;height:100px;border-radius:50%;flex-shrink:0;
+  background:conic-gradient(var(--green) 0deg var(--vend-deg,180deg),var(--red) var(--vend-deg,180deg) 360deg);
+  display:flex;align-items:center;justify-content:center;position:relative;
+}
+.donut::after{
+  content:'';position:absolute;width:60px;height:60px;
+  background:var(--bg2);border-radius:50%;
+}
+.donut-legend{display:flex;flex-direction:column;gap:8px;flex:1}
+.dl-row{display:flex;align-items:center;gap:8px}
+.dl-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.dl-label{font-size:12px;color:var(--text2);flex:1}
+.dl-val{font-size:13px;font-weight:700}
+
+/* Category bars */
+.cat-bar-row{margin-bottom:10px}
+.cat-bar-header{display:flex;justify-content:space-between;margin-bottom:4px}
+.cat-bar-name{font-size:12px;color:var(--text);font-weight:600}
+.cat-bar-val{font-size:12px;color:var(--text2)}
+.cat-bar-track{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.cat-bar-fill{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.34,1.56,.64,1)}
+
+/* ========== SETTINGS PAGE ========== */
+.settings-section{margin-bottom:24px}
+.settings-title{
+  font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:1px;color:var(--text3);margin-bottom:10px;padding:0 4px;
+}
+.settings-card{
+  background:var(--bg2);border:1px solid var(--border2);
+  border-radius:var(--r);overflow:hidden;
+}
+.settings-row{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 16px;border-bottom:1px solid var(--border2);
+  transition:background .15s;cursor:pointer;
+}
+.settings-row:last-child{border-bottom:none}
+.settings-row:hover{background:var(--bg3)}
+.sr-icon{
+  width:36px;height:36px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;
+}
+.sr-body{flex:1}
+.sr-title{font-size:14px;font-weight:600}
+.sr-sub{font-size:12px;color:var(--text2);margin-top:1px}
+.sr-arrow{color:var(--text3);font-size:14px}
+.toggle{
+  width:44px;height:26px;background:var(--bg3);border-radius:13px;
+  position:relative;cursor:pointer;flex-shrink:0;border:none;
+  transition:background .2s;
+}
+.toggle.on{background:var(--p)}
+.toggle::after{
+  content:'';position:absolute;top:3px;left:3px;
+  width:20px;height:20px;background:#fff;border-radius:50%;
+  transition:left .2s;box-shadow:0 2px 4px rgba(0,0,0,.3);
+}
+.toggle.on::after{left:21px}
+
+/* Sync config */
+.sync-setup{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--r);padding:20px;margin-bottom:16px;
+}
+.sync-setup-title{font-size:15px;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.sync-setup-sub{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:14px}
+.sync-code-row{display:flex;gap:8px;align-items:center}
+.sync-code-inp{
+  flex:1;background:var(--bg3);border:1.5px solid var(--border2);border-radius:10px;
+  color:var(--text);padding:10px 12px;font-size:13px;outline:none;
+  font-family:'Courier New',monospace;letter-spacing:.5px;
+  transition:border-color .2s;
+}
+.sync-code-inp:focus{border-color:var(--p)}
+.sync-code-inp::placeholder{color:var(--text3);font-family:inherit}
+.btn-p{
+  background:linear-gradient(135deg,var(--p),var(--p2));
+  border:none;border-radius:10px;color:#fff;
+  padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer;
+  transition:all .2s;white-space:nowrap;
+}
+.btn-p:hover{opacity:.9;transform:translateY(-1px);box-shadow:var(--shadow-p)}
+.btn-sm{padding:8px 12px;font-size:12px;border-radius:8px}
+.btn-ghost{
+  background:var(--bg3);border:1px solid var(--border2);color:var(--text2);
+  border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;
+  cursor:pointer;transition:all .2s;
+}
+.btn-ghost:hover{background:var(--bg4);color:var(--text)}
+.steps{padding:0;list-style:none;margin-top:14px}
+.step{
+  display:flex;gap:10px;padding:8px 0;
+  border-bottom:1px solid var(--border2);font-size:12px;color:var(--text2);line-height:1.5;
+}
+.step:last-child{border:none}
+.step-num{
+  width:20px;height:20px;border-radius:50%;background:var(--p);
+  color:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:800;flex-shrink:0;margin-top:1px;
+}
+
+/* ========== MODAL ========== */
+.overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;
+  display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.overlay.open{opacity:1;pointer-events:all}
+.sheet{
+  background:var(--bg2);border-radius:24px 24px 0 0;
+  width:100%;max-width:640px;
+  padding:0 0 calc(20px + env(safe-area-inset-bottom));
+  transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);
+  max-height:92vh;overflow-y:auto;
+}
+.overlay.open .sheet{transform:translateY(0)}
+.sheet-handle{
+  width:40px;height:4px;background:var(--bg4);border-radius:2px;
+  margin:12px auto 0;
+}
+.sheet-header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:16px 20px;border-bottom:1px solid var(--border2);position:sticky;top:0;
+  background:var(--bg2);z-index:1;
+}
+.sheet-title{font-size:17px;font-weight:800}
+.sheet-close{
+  width:30px;height:30px;background:var(--bg3);border:none;border-radius:8px;
+  color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:15px;transition:all .2s;
+}
+.sheet-close:hover{background:var(--red);color:#fff}
+.sheet-body{padding:20px}
+
+/* FORM */
+.fg{margin-bottom:16px}
+.flabel{
+  display:block;font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.7px;color:var(--text2);margin-bottom:7px;
+}
+.finput{
+  width:100%;background:var(--bg3);border:1.5px solid var(--border2);
+  border-radius:10px;color:var(--text);padding:12px 14px;
+  font-size:14px;outline:none;transition:border-color .2s;
+}
+.finput:focus{border-color:var(--p)}
+.finput::placeholder{color:var(--text3)}
+.finput option{background:var(--bg2)}
+.price-wrap{position:relative}
+.price-prefix{
+  position:absolute;left:12px;top:50%;transform:translateY(-50%);
+  font-size:14px;font-weight:700;color:var(--text2);
+}
+.finput.price{padding-left:38px}
+
+/* TYPE TOGGLE */
+.type-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.type-opt{
+  padding:12px;border-radius:12px;border:2px solid var(--border2);
+  background:var(--bg3);color:var(--text2);cursor:pointer;
+  font-size:14px;font-weight:700;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.type-opt.sel-v{border-color:var(--green);background:rgba(16,185,129,.1);color:var(--green)}
+.type-opt.sel-c{border-color:var(--red);background:rgba(239,68,68,.1);color:var(--red)}
+
+/* PHOTO UPLOAD */
+.photo-area{
+  border:2px dashed var(--border2);border-radius:12px;padding:22px;
+  text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;
+}
+.photo-area:hover{border-color:var(--p);background:rgba(139,92,246,.05)}
+.photo-area.has-img{padding:0;border-style:solid;border-color:var(--green)}
+.photo-area img{width:100%;height:150px;object-fit:cover;border-radius:10px;display:block}
+.photo-area .ph-icon{font-size:28px;margin-bottom:6px}
+.photo-area .ph-text{font-size:13px;color:var(--text2)}
+.photo-rm{
+  position:absolute;top:8px;right:8px;background:rgba(0,0,0,.65);
+  border:none;border-radius:7px;color:#fff;padding:4px 8px;font-size:12px;cursor:pointer;
+}
+
+/* SUBMIT BTN */
+.btn-submit{
+  width:100%;padding:15px;background:linear-gradient(135deg,var(--p),#4f46e5);
+  border:none;border-radius:14px;color:#fff;font-size:15px;font-weight:800;
+  cursor:pointer;transition:all .2s;margin-top:6px;
+  box-shadow:0 4px 16px rgba(139,92,246,.3);
+}
+.btn-submit:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(139,92,246,.4)}
+.btn-submit:active{transform:translateY(0)}
+
+/* FAB */
+.fab{
+  position:fixed;right:20px;bottom:calc(82px + env(safe-area-inset-bottom));z-index:90;
+  width:54px;height:54px;
+  background:linear-gradient(135deg,var(--p),var(--cyan));
+  border:none;border-radius:16px;color:#fff;font-size:26px;
+  cursor:pointer;box-shadow:0 6px 24px rgba(139,92,246,.5);
+  display:flex;align-items:center;justify-content:center;
+  transition:all .25s cubic-bezier(.34,1.56,.64,1);
+}
+.fab:hover{transform:scale(1.1) rotate(8deg)}
+.fab:active{transform:scale(.95)}
+
+/* TOAST */
+.toast{
+  position:fixed;top:calc(70px + env(safe-area-inset-top));right:16px;
+  background:var(--bg2);border:1px solid var(--border2);border-radius:12px;
+  padding:11px 16px;font-size:13px;font-weight:600;z-index:300;
+  display:flex;align-items:center;gap:8px;
+  transform:translateX(calc(100% + 20px));opacity:0;
+  transition:all .3s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:var(--shadow);max-width:280px;
+}
+.toast.show{transform:translateX(0);opacity:1}
+.toast.ok{border-color:var(--green);color:var(--green)}
+.toast.err{border-color:var(--red);color:var(--red)}
+.toast.info{border-color:var(--p);color:var(--p)}
+
+/* CONFIRM */
+.confirm-sheet{
+  background:var(--bg2);border-radius:24px 24px 0 0;
+  width:100%;max-width:640px;
+  padding:28px 24px calc(24px + env(safe-area-inset-bottom));
+  text-align:center;
+  transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);
+}
+.overlay.open .confirm-sheet{transform:translateY(0)}
+.ci{font-size:44px;margin-bottom:12px}
+.ct{font-size:18px;font-weight:800;margin-bottom:6px}
+.cs{font-size:13px;color:var(--text2);margin-bottom:22px}
+.ca{display:flex;gap:10px}
+.btn-cancel{
+  flex:1;padding:13px;background:var(--bg3);border:1px solid var(--border2);
+  border-radius:12px;color:var(--text2);cursor:pointer;font-size:14px;font-weight:700;
+  transition:all .2s;
+}
+.btn-cancel:hover{color:var(--text)}
+.btn-danger{
+  flex:1;padding:13px;background:var(--red);border:none;
+  border-radius:12px;color:#fff;cursor:pointer;font-size:14px;font-weight:700;
+  transition:all .2s;
+}
+.btn-danger:hover{background:var(--red2)}
+
+/* RESPONSIVE desktop */
+@media(min-width:640px){
+  .mini-cards{grid-template-columns:repeat(4,1fr)}
+  .tx-card:hover .tx-actions{opacity:1}
+}
+@media(max-width:400px){
+  .profit-value{font-size:34px}
+  .mini-cards{gap:8px}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">💰</div>
+      Bric
+    </div>
+    <div class="header-btns">
+      <button class="hbtn" id="btnExport" onclick="exportCSV()" title="Exportar CSV">📥</button>
+      <button class="hbtn" onclick="navTo('settings')" title="Configurações">⚙️</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- Update banner -->
+  <div class="update-banner" id="updateBanner" onclick="applyUpdate()">
+    <span>⚡</span>
+    <span class="update-banner-text">Nova versão disponível!</span>
+    <button class="update-btn">Atualizar</button>
+  </div>
+
+  <!-- Sync status -->
+  <div class="sync-bar" id="syncBar">
+    <div class="sync-dot"></div>
+    <span id="syncLabel">Sincronizado</span>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="page-dashboard" class="page active">
+    <div class="profit-card">
+      <div class="profit-label">Lucro Líquido</div>
+      <div class="profit-value" id="lucro">R$ 0</div>
+      <div class="profit-sub" id="lucroSub">Nenhuma transação ainda</div>
+      <div class="profit-trend" id="lucroTrend">—</div>
+    </div>
+
+    <div class="mini-cards">
+      <div class="mini-card green">
+        <div class="mc-label">💚 Vendido</div>
+        <div class="mc-value" id="mcVendido">R$ 0</div>
+        <div class="mc-sub" id="mcVendasQtd">0 vendas</div>
+      </div>
+      <div class="mini-card red">
+        <div class="mc-label">❤️ Gasto</div>
+        <div class="mc-value" id="mcGasto">R$ 0</div>
+        <div class="mc-sub" id="mcComprasQtd">0 compras</div>
+      </div>
+      <div class="mini-card blue">
+        <div class="mc-label">📦 Itens</div>
+        <div class="mc-value" id="mcItens">0</div>
+        <div class="mc-sub">transações</div>
+      </div>
+      <div class="mini-card gold">
+        <div class="mc-label">💛 Ticket Médio</div>
+        <div class="mc-value" id="mcTicket">R$ 0</div>
+        <div class="mc-sub">por item</div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div class="chart-card-title">📅 Histórico</div>
+        <div class="chart-tabs">
+          <div class="chart-tab active" onclick="setChartMode('7d',this)">7d</div>
+          <div class="chart-tab" onclick="setChartMode('30d',this)">30d</div>
+          <div class="chart-tab" onclick="setChartMode('all',this)">Tudo</div>
+        </div>
+      </div>
+      <div class="bar-chart" id="barChart"></div>
+      <div class="chart-legend">
+        <div class="c-leg"><div class="c-dot" style="background:var(--green)"></div>Vendas</div>
+        <div class="c-leg"><div class="c-dot" style="background:var(--red)"></div>Compras</div>
+      </div>
+    </div>
+
+    <div class="section-row">
+      <div class="section-title">⏱️ Recentes</div>
+      <button class="see-all" onclick="navTo('transactions')">Ver todas →</button>
+    </div>
+    <div class="tx-list" id="recentList"></div>
+  </div>
+
+  <!-- TRANSACTIONS -->
+  <div id="page-transactions" class="page">
+    <div class="filter-bar">
+      <button class="fbtn on" id="fa-all" onclick="setFilter('all',this,'')">Todas</button>
+      <button class="fbtn" id="fa-v" onclick="setFilter('venda',this,'v')">💚 Vendas</button>
+      <button class="fbtn" id="fa-c" onclick="setFilter('compra',this,'c')">❤️ Compras</button>
+    </div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-inp" id="searchInp" type="text" placeholder="Buscar por nome ou categoria..." oninput="renderAll()">
+    </div>
+    <div class="sort-row">
+      <span class="sort-label">Ordenar por</span>
+      <select class="sort-select" onchange="renderAll()">
+        <option value="recent">Mais recente</option>
+        <option value="oldest">Mais antigo</option>
+        <option value="higher">Maior valor</option>
+        <option value="lower">Menor valor</option>
+      </select>
+    </div>
+    <div class="tx-list" id="txList"></div>
+  </div>
+
+  <!-- GRAPHS -->
+  <div id="page-graphs" class="page">
+    <div class="chart-card graph-section">
+      <div class="g-title">📊 Distribuição de Valores</div>
+      <div class="donut-wrap">
+        <div class="donut" id="donutChart"></div>
+        <div class="donut-legend">
+          <div class="dl-row"><div class="dl-dot" style="background:var(--green)"></div><div class="dl-label">Vendas</div><div class="dl-val" id="dlVendas" style="color:var(--green)">R$ 0</div></div>
+          <div class="dl-row"><div class="dl-dot" style="background:var(--red)"></div><div class="dl-label">Compras</div><div class="dl-val" id="dlCompras" style="color:var(--red)">R$ 0</div></div>
+          <div class="dl-row"><div class="dl-dot" style="background:var(--p)"></div><div class="dl-label">Lucro</div><div class="dl-val" id="dlLucro" style="color:var(--p)">R$ 0</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-card graph-section">
+      <div class="g-title">🏷️ Por Categoria (Vendas)</div>
+      <div id="catBarsV"></div>
+    </div>
+
+    <div class="chart-card graph-section">
+      <div class="g-title">🛒 Por Categoria (Compras)</div>
+      <div id="catBarsC"></div>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div id="page-settings" class="page">
+    <div class="sync-setup" id="syncSetup">
+      <div class="sync-setup-title">☁️ Sincronização entre Dispositivos</div>
+      <div class="sync-setup-sub">
+        Acesse seus dados em qualquer celular, tablet ou computador em tempo real usando o Firebase gratuito.
+      </div>
+      <div id="syncConfigured" style="display:none">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <div class="sync-dot" style="width:8px;height:8px"></div>
+          <span style="font-size:13px;font-weight:600;color:var(--green)">Sync ativo</span>
+        </div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:12px">
+          Sua sala de sync: <code id="currentRoom" style="color:var(--p);font-size:13px"></code>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-ghost btn-sm" onclick="copiarRoomId()">📋 Copiar código</button>
+          <button class="btn-ghost btn-sm" onclick="desativarSync()">🔌 Desativar</button>
+        </div>
+      </div>
+      <div id="syncForm">
+        <div class="fg">
+          <label class="flabel">Código de Sala (crie um ou use um existente)</label>
+          <div class="sync-code-row">
+            <input class="sync-code-inp" id="roomIdInp" placeholder="ex: rafael-bric-2024" maxlength="40">
+            <button class="btn-ghost btn-sm" onclick="gerarRoomId()">🎲</button>
+          </div>
+        </div>
+        <div class="fg">
+          <label class="flabel">Config Firebase (JSON)</label>
+          <textarea class="finput" id="fbConfigInp" rows="5" placeholder='{"apiKey":"...","authDomain":"...","projectId":"...","storageBucket":"...","messagingSenderId":"...","appId":"..."}'></textarea>
+        </div>
+        <button class="btn-p" style="width:100%" onclick="ativarSync()">🔗 Ativar Sync</button>
+        <ol class="steps">
+          <li class="step"><div class="step-num">1</div><div>Acesse <strong>console.firebase.google.com</strong> e crie um projeto gratuito</div></li>
+          <li class="step"><div class="step-num">2</div><div>Clique em <strong>"Adicionar app" → Web (&lt;/&gt;)</strong> e copie o objeto <code>firebaseConfig</code></div></li>
+          <li class="step"><div class="step-num">3</div><div>Vá em <strong>Firestore Database → Criar banco → Modo de teste</strong></div></li>
+          <li class="step"><div class="step-num">4</div><div>Cole o JSON acima, escolha um código de sala e ative</div></li>
+          <li class="step"><div class="step-num">5</div><div>No celular, abra o app e use o <strong>mesmo código de sala</strong> para sincronizar ✅</div></li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-title">Dados</div>
+      <div class="settings-card">
+        <div class="settings-row" onclick="exportCSV()">
+          <div class="sr-icon" style="background:rgba(16,185,129,.15)">📥</div>
+          <div class="sr-body">
+            <div class="sr-title">Exportar CSV</div>
+            <div class="sr-sub">Baixar todas as transações</div>
+          </div>
+          <div class="sr-arrow">›</div>
+        </div>
+        <div class="settings-row" onclick="importarDados()">
+          <div class="sr-icon" style="background:rgba(59,130,246,.15)">📤</div>
+          <div class="sr-body">
+            <div class="sr-title">Importar CSV</div>
+            <div class="sr-sub">Restaurar backup</div>
+          </div>
+          <div class="sr-arrow">›</div>
+        </div>
+        <div class="settings-row" onclick="pedirLimpar()">
+          <div class="sr-icon" style="background:rgba(239,68,68,.15)">🗑️</div>
+          <div class="sr-body">
+            <div class="sr-title">Limpar tudo</div>
+            <div class="sr-sub">Apagar todas as transações</div>
+          </div>
+          <div class="sr-arrow">›</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-title">Sobre</div>
+      <div class="settings-card">
+        <div class="settings-row" style="cursor:default">
+          <div class="sr-icon" style="background:rgba(139,92,246,.15)">💰</div>
+          <div class="sr-body">
+            <div class="sr-title">Bric v2.0</div>
+            <div class="sr-sub">Controle de compras e vendas · PWA</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <input type="file" id="importInput" accept=".csv" style="display:none" onchange="processarImport(event)">
+  </div>
+</main>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <div class="nav-item active" id="nav-dashboard" onclick="navTo('dashboard')">
+    <div class="nav-icon">📊</div>
+    <div class="nav-label">Dashboard</div>
+  </div>
+  <div class="nav-item" id="nav-transactions" onclick="navTo('transactions')">
+    <div class="nav-icon">📋</div>
+    <div class="nav-label">Transações</div>
+  </div>
+  <div class="nav-item" id="nav-graphs" onclick="navTo('graphs')">
+    <div class="nav-icon">📈</div>
+    <div class="nav-label">Gráficos</div>
+  </div>
+  <div class="nav-item" id="nav-settings" onclick="navTo('settings')">
+    <div class="nav-icon">⚙️</div>
+    <div class="nav-label">Config</div>
+  </div>
+</nav>
+
+<!-- FAB -->
+<button class="fab" onclick="abrirModal()" title="Nova transação (Ctrl+N)">+</button>
+
+<!-- MODAL -->
+<div class="overlay" id="modalOverlay" onclick="fecharModalClick(event)">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <div class="sheet-title" id="sheetTitle">Nova Transação</div>
+      <button class="sheet-close" onclick="fecharModal()">✕</button>
+    </div>
+    <div class="sheet-body">
+      <div class="fg">
+        <label class="flabel">Tipo</label>
+        <div class="type-row">
+          <button class="type-opt sel-v" id="optV" onclick="setTipo('venda')">💚 Vendi</button>
+          <button class="type-opt" id="optC" onclick="setTipo('compra')">❤️ Comprei</button>
+        </div>
+      </div>
+      <div class="fg">
+        <label class="flabel">Nome do Item</label>
+        <input class="finput" id="fNome" type="text" placeholder="Ex: Tênis Nike, iPhone, Placa de vídeo...">
+      </div>
+      <div class="fg">
+        <label class="flabel">Preço (R$)</label>
+        <div class="price-wrap">
+          <span class="price-prefix">R$</span>
+          <input class="finput price" id="fPreco" type="number" placeholder="0,00" step="0.01" min="0" inputmode="decimal">
+        </div>
+      </div>
+      <div class="fg" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label class="flabel">Categoria</label>
+          <select class="finput" id="fCat">
+            <option value="">Sem categoria</option>
+            <option>👗 Roupas</option><option>📱 Eletrônicos</option>
+            <option>👟 Calçados</option><option>🎮 Games</option>
+            <option>📚 Livros</option><option>🪑 Móveis</option>
+            <option>💍 Acessórios</option><option>⚽ Esportes</option>
+            <option>💄 Beleza</option><option>🚗 Veículos</option>
+            <option>🏠 Casa</option><option>📦 Outros</option>
+          </select>
+        </div>
+        <div>
+          <label class="flabel">Data</label>
+          <input class="finput" id="fData" type="date">
+        </div>
+      </div>
+      <div class="fg">
+        <label class="flabel">Observação</label>
+        <input class="finput" id="fNota" type="text" placeholder="Condição, plataforma, comprador...">
+      </div>
+      <div class="fg">
+        <label class="flabel">Foto</label>
+        <div class="photo-area" id="photoArea" onclick="document.getElementById('photoInp').click()">
+          <div id="phPlaceholder">
+            <div class="ph-icon">📷</div>
+            <div class="ph-text">Toque para adicionar foto</div>
+          </div>
+          <img id="phPreview" style="display:none">
+          <button class="photo-rm" id="phRemoveBtn" onclick="rmFoto(event)" style="display:none">✕</button>
+        </div>
+        <input type="file" id="photoInp" accept="image/*" onchange="loadFoto(event)" style="display:none">
+      </div>
+      <button class="btn-submit" onclick="salvar()">✓ Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM -->
+<div class="overlay" id="confirmOverlay" onclick="fecharConfirmClick(event)">
+  <div class="confirm-sheet">
+    <div class="ci" id="ciIcon">🗑️</div>
+    <div class="ct" id="ciTitle">Excluir transação?</div>
+    <div class="cs" id="ciSub">Esta ação não pode ser desfeita.</div>
+    <div class="ca">
+      <button class="btn-cancel" onclick="fecharConfirm()">Cancelar</button>
+      <button class="btn-danger" id="ciConfirmBtn" onclick="confirmarAcao()">Excluir</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- Firebase SDKs (carregados sob demanda) -->
+<script id="fbScriptApp"></script>
+<script id="fbScriptFS"></script>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+let txs = JSON.parse(localStorage.getItem('bric_txs') || '[]');
+let tipoAtual = 'venda';
+let fotoAtual = null;
+let filterAtual = 'all';
+let chartMode = '7d';
+let deleteId = null;
+let editId = null;
+let confirmCallback = null;
+let newSW = null;
+let db = null;
+let unsubscribe = null;
+let syncAtivo = false;
+let sortMode = 'recent';
+
+const fbConfig = JSON.parse(localStorage.getItem('bric_fbConfig') || 'null');
+const roomId   = localStorage.getItem('bric_roomId') || null;
+
+// ============================================================
+// BOOT
+// ============================================================
+document.getElementById('fData').value = hoje();
+renderAll();
+initSync();
+registerSW();
+
+// ============================================================
+// SERVICE WORKER
+// ============================================================
+function registerSW() {
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.register('./sw.js').then(reg => {
+    reg.addEventListener('updatefound', () => {
+      const sw = reg.installing;
+      sw.addEventListener('statechange', () => {
+        if (sw.state === 'installed' && navigator.serviceWorker.controller) {
+          newSW = sw;
+          document.getElementById('updateBanner').classList.add('show');
+        }
+      });
+    });
+  });
+  navigator.serviceWorker.addEventListener('controllerchange', () => location.reload());
+}
+
+function applyUpdate() {
+  if (newSW) newSW.postMessage('SKIP_WAITING');
+}
+
+// ============================================================
+// SYNC — FIREBASE
+// ============================================================
+async function initSync() {
+  const cfg = JSON.parse(localStorage.getItem('bric_fbConfig') || 'null');
+  const rid  = localStorage.getItem('bric_roomId');
+  if (!cfg || !rid) return;
+  await carregarFirebase(cfg, rid);
+}
+
+function carregarFirebase(cfg, rid) {
+  return new Promise((resolve, reject) => {
+    // Evita carregar 2x
+    if (window.firebase && window.firebase.apps && window.firebase.apps.length) {
+      ligarSync(rid); resolve(); return;
+    }
+    let loaded = 0;
+    const check = () => { if (++loaded === 2) { ligarSync(rid); resolve(); } };
+    const s1 = document.createElement('script');
+    s1.src = 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js';
+    s1.onload = check; s1.onerror = reject;
+    const s2 = document.createElement('script');
+    s2.src = 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js';
+    s2.onload = check; s2.onerror = reject;
+    document.head.appendChild(s1);
+    document.head.appendChild(s2);
+  });
+}
+
+function ligarSync(rid) {
+  try {
+    const cfg = JSON.parse(localStorage.getItem('bric_fbConfig'));
+    if (!window.firebase.apps.length) window.firebase.initializeApp(cfg);
+    db = window.firebase.firestore();
+    syncAtivo = true;
+    mostrarSyncBar('Sincronizando...', false);
+
+    if (unsubscribe) unsubscribe();
+    unsubscribe = db.collection('bric_' + rid).onSnapshot(snap => {
+      const remotas = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      txs = remotas;
+      salvarLocal();
+      renderAll();
+      mostrarSyncBar('Sincronizado ✓', false);
+    }, err => {
+      mostrarSyncBar('Sem conexão', true);
+    });
+
+    // Atualizar UI de config
+    document.getElementById('currentRoom').textContent = rid;
+    document.getElementById('syncConfigured').style.display = 'block';
+    document.getElementById('syncForm').style.display = 'none';
+  } catch(e) {
+    toast('Erro ao conectar Firebase: ' + e.message, 'err');
+  }
+}
+
+async function ativarSync() {
+  const rid = document.getElementById('roomIdInp').value.trim();
+  const cfgStr = document.getElementById('fbConfigInp').value.trim();
+  if (!rid) return toast('⚠️ Digite um código de sala', 'err');
+  if (!cfgStr) return toast('⚠️ Cole a config Firebase', 'err');
+  let cfg;
+  try { cfg = JSON.parse(cfgStr); } catch { return toast('⚠️ JSON inválido', 'err'); }
+  if (!cfg.apiKey) return toast('⚠️ Config Firebase incompleta', 'err');
+
+  localStorage.setItem('bric_fbConfig', cfgStr);
+  localStorage.setItem('bric_roomId', rid);
+  toast('🔗 Conectando...', 'info');
+
+  try {
+    await carregarFirebase(cfg, rid);
+    // Upload txs locais que ainda não estão na nuvem
+    if (txs.length > 0) {
+      const batch = db.batch();
+      txs.forEach(t => {
+        const ref = db.collection('bric_' + rid).doc(t.id);
+        batch.set(ref, t);
+      });
+      await batch.commit();
+    }
+    toast('✅ Sync ativado!', 'ok');
+  } catch(e) {
+    toast('Erro: ' + e.message, 'err');
+  }
+}
+
+function desativarSync() {
+  if (!confirm('Desativar sync? Os dados ficam só neste dispositivo.')) return;
+  if (unsubscribe) unsubscribe();
+  syncAtivo = false; db = null;
+  localStorage.removeItem('bric_fbConfig');
+  localStorage.removeItem('bric_roomId');
+  document.getElementById('syncConfigured').style.display = 'none';
+  document.getElementById('syncForm').style.display = 'block';
+  document.getElementById('syncBar').classList.remove('show');
+  toast('🔌 Sync desativado', 'info');
+}
+
+function mostrarSyncBar(msg, offline) {
+  const bar = document.getElementById('syncBar');
+  document.getElementById('syncLabel').textContent = msg;
+  bar.className = 'sync-bar show' + (offline ? ' offline' : '');
+  if (!offline) setTimeout(() => bar.classList.remove('show'), 4000);
+}
+
+function gerarRoomId() {
+  const words = ['bric','minha','loja','vendas','caixa','grana','negocio'];
+  const w = words[Math.floor(Math.random()*words.length)];
+  const n = Math.floor(Math.random()*9000)+1000;
+  document.getElementById('roomIdInp').value = w + '-' + n;
+}
+
+function copiarRoomId() {
+  const rid = localStorage.getItem('bric_roomId');
+  navigator.clipboard.writeText(rid || '').then(() => toast('📋 Código copiado!', 'ok'));
+}
+
+// ============================================================
+// CRUD
+// ============================================================
+async function salvar() {
+  const nome  = document.getElementById('fNome').value.trim();
+  const preco = parseFloat(document.getElementById('fPreco').value);
+  if (!nome)          return toast('⚠️ Digite o nome', 'err');
+  if (!preco || preco <= 0) return toast('⚠️ Preço inválido', 'err');
+
+  const t = {
+    id: editId || Date.now().toString(),
+    tipo: tipoAtual,
+    nome,
+    preco,
+    cat: document.getElementById('fCat').value,
+    data: document.getElementById('fData').value,
+    nota: document.getElementById('fNota').value.trim(),
+    foto: fotoAtual,
+    ts: editId ? (txs.find(x=>x.id===editId)?.ts || Date.now()) : Date.now()
+  };
+
+  if (syncAtivo && db) {
+    const rid = localStorage.getItem('bric_roomId');
+    try {
+      await db.collection('bric_' + rid).doc(t.id).set(t);
+    } catch(e) { toast('Erro ao salvar na nuvem', 'err'); return; }
+  } else {
+    if (editId) {
+      const i = txs.findIndex(x=>x.id===editId);
+      txs[i] = t;
+    } else {
+      txs.push(t);
+    }
+    salvarLocal();
+    renderAll();
+  }
+
+  fecharModal();
+  toast(editId ? '✏️ Atualizado!' : (tipoAtual==='venda' ? '💚 Venda registrada!' : '❤️ Compra registrada!'), 'ok');
+  if (navigator.vibrate) navigator.vibrate(30);
+}
+
+async function deletar(id) {
+  if (syncAtivo && db) {
+    const rid = localStorage.getItem('bric_roomId');
+    try { await db.collection('bric_' + rid).doc(id).delete(); }
+    catch(e) { toast('Erro ao excluir', 'err'); return; }
+  } else {
+    txs = txs.filter(t => t.id !== id);
+    salvarLocal();
+    renderAll();
+  }
+  toast('🗑️ Excluído', 'info');
+}
+
+function salvarLocal() {
+  localStorage.setItem('bric_txs', JSON.stringify(txs));
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function renderAll() {
+  renderDash();
+  renderTxList();
+  renderGraphs();
+}
+
+function renderDash() {
+  const v = txs.filter(t=>t.tipo==='venda');
+  const c = txs.filter(t=>t.tipo==='compra');
+  const tv = v.reduce((s,t)=>s+t.preco,0);
+  const tc = c.reduce((s,t)=>s+t.preco,0);
+  const lq = tv - tc;
+  const total = txs.length;
+
+  document.getElementById('lucro').textContent = fmtR(lq);
+  document.getElementById('lucro').style.color = lq >= 0 ? '#fff' : '#fca5a5';
+  document.getElementById('lucroSub').textContent = total===0 ? 'Nenhuma transação ainda' : `${v.length} venda${v.length!==1?'s':''} · ${c.length} compra${c.length!==1?'s':''}`;
+  document.getElementById('lucroTrend').textContent = lq > 0 ? '📈 Positivo' : lq < 0 ? '📉 Negativo' : '⚖️ Zero';
+
+  document.getElementById('mcVendido').textContent = fmtR(tv);
+  document.getElementById('mcGasto').textContent   = fmtR(tc);
+  document.getElementById('mcItens').textContent   = total;
+  document.getElementById('mcTicket').textContent  = total>0 ? fmtR((tv+tc)/total) : 'R$ 0';
+  document.getElementById('mcVendasQtd').textContent  = v.length + ' venda' + (v.length!==1?'s':'');
+  document.getElementById('mcComprasQtd').textContent = c.length + ' compra' + (c.length!==1?'s':'');
+
+  renderChart();
+  renderRecent();
+}
+
+function renderChart() {
+  const chart = document.getElementById('barChart');
+  if (!txs.length) {
+    chart.innerHTML = '<div style="text-align:center;width:100%;padding:20px 0;color:var(--text3);font-size:12px">Sem dados</div>';
+    return;
+  }
+
+  // Filter by mode
+  const now = new Date();
+  let cutoff = null;
+  if (chartMode === '7d')  cutoff = new Date(now - 7*86400000);
+  if (chartMode === '30d') cutoff = new Date(now - 30*86400000);
+
+  const byDate = {};
+  txs.forEach(t => {
+    if (!t.data) return;
+    const d = new Date(t.data + 'T12:00:00');
+    if (cutoff && d < cutoff) return;
+    if (!byDate[t.data]) byDate[t.data] = {v:0,c:0};
+    byDate[t.data][t.tipo==='venda'?'v':'c'] += t.preco;
+  });
+
+  const dates = Object.keys(byDate).sort();
+  if (!dates.length) {
+    chart.innerHTML = '<div style="text-align:center;width:100%;padding:20px 0;color:var(--text3);font-size:12px">Sem dados no período</div>';
+    return;
+  }
+  const maxV = Math.max(...dates.map(d => Math.max(byDate[d].v, byDate[d].c)));
+
+  chart.innerHTML = dates.map(d => {
+    const vh = maxV > 0 ? Math.round((byDate[d].v/maxV)*74) : 0;
+    const ch = maxV > 0 ? Math.round((byDate[d].c/maxV)*74) : 0;
+    const lbl = d.slice(5).replace('-','/');
+    return `<div class="bar-group">
+      <div class="bars">
+        <div class="bar v" style="height:${vh}px" title="Vendas: ${fmtR(byDate[d].v)}"></div>
+        <div class="bar c" style="height:${ch}px" title="Compras: ${fmtR(byDate[d].c)}"></div>
+      </div>
+      <div class="bar-lbl">${lbl}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderRecent() {
+  const lista = txs.slice().sort((a,b)=>b.ts-a.ts).slice(0,5);
+  document.getElementById('recentList').innerHTML = lista.length===0
+    ? `<div class="empty"><div class="empty-emoji">📦</div><div class="empty-title">Nenhuma transação</div><div class="empty-sub">Toque no + para adicionar</div></div>`
+    : lista.map(t => txHTML(t, true)).join('');
+}
+
+function renderTxList() {
+  const q = (document.getElementById('searchInp')?.value||'').toLowerCase();
+  const sortSel = document.querySelector('.sort-select');
+  sortMode = sortSel ? sortSel.value : 'recent';
+
+  let lista = [...txs];
+  if (filterAtual !== 'all') lista = lista.filter(t=>t.tipo===filterAtual);
+  if (q) lista = lista.filter(t => t.nome.toLowerCase().includes(q) || (t.cat||'').toLowerCase().includes(q));
+
+  if (sortMode === 'recent')  lista.sort((a,b) => b.ts - a.ts);
+  if (sortMode === 'oldest')  lista.sort((a,b) => a.ts - b.ts);
+  if (sortMode === 'higher')  lista.sort((a,b) => b.preco - a.preco);
+  if (sortMode === 'lower')   lista.sort((a,b) => a.preco - b.preco);
+
+  const el = document.getElementById('txList');
+  el.innerHTML = lista.length === 0
+    ? `<div class="empty"><div class="empty-emoji">🔍</div><div class="empty-title">Nenhum resultado</div></div>`
+    : lista.map(t => txHTML(t, false)).join('');
+}
+
+function txHTML(t, mini) {
+  const foto = t.foto
+    ? `<div class="tx-thumb"><img src="${t.foto}" alt="${t.nome}"></div>`
+    : `<div class="tx-thumb">${t.tipo==='venda'?'💚':'❤️'}</div>`;
+  const catHtml = t.cat ? `<span class="tx-cat">${t.cat.replace(/^[^\s]+\s/,'')}</span>` : '';
+  const notaHtml = t.nota ? `<div class="tx-note">💬 ${t.nota}</div>` : '';
+  const actions = mini ? '' : `
+    <div class="tx-actions">
+      <button class="act-btn edt" onclick="editarTx('${t.id}')" title="Editar">✏️</button>
+      <button class="act-btn del" onclick="pedirDelete('${t.id}')" title="Excluir">🗑️</button>
+    </div>`;
+  const sinal = t.tipo==='venda' ? '+' : '-';
+  return `<div class="tx-card ${t.tipo==='venda'?'v':'c'}">
+    ${foto}
+    <div class="tx-body">
+      <div class="tx-name">${t.nome}</div>
+      <div class="tx-meta">
+        <span class="badge ${t.tipo==='venda'?'v':'c'}">${t.tipo==='venda'?'Vendido':'Comprado'}</span>
+        ${catHtml}
+        ${t.data ? `<span class="tx-date">${fmtData(t.data)}</span>` : ''}
+      </div>
+      ${notaHtml}
+    </div>
+    <div class="tx-price ${t.tipo==='venda'?'v':'c'}">
+      <span class="tx-sign">${sinal}</span>${fmtR(t.preco)}
+    </div>
+    ${actions}
+  </div>`;
+}
+
+function renderGraphs() {
+  const v = txs.filter(t=>t.tipo==='venda');
+  const c = txs.filter(t=>t.tipo==='compra');
+  const tv = v.reduce((s,t)=>s+t.preco,0);
+  const tc = c.reduce((s,t)=>s+t.preco,0);
+  const lq = tv - tc;
+  const total = tv + tc;
+
+  // Donut
+  const vDeg = total > 0 ? Math.round((tv/total)*360) : 180;
+  document.getElementById('donutChart').style.setProperty('--vend-deg', vDeg + 'deg');
+  document.getElementById('dlVendas').textContent = fmtR(tv);
+  document.getElementById('dlCompras').textContent = fmtR(tc);
+  document.getElementById('dlLucro').textContent = fmtR(lq);
+  document.getElementById('dlLucro').style.color = lq >= 0 ? 'var(--green)' : 'var(--red)';
+
+  // Category bars
+  renderCatBars('catBarsV', v, tv);
+  renderCatBars('catBarsC', c, tc);
+}
+
+function renderCatBars(elId, lista, total) {
+  const el = document.getElementById(elId);
+  if (!lista.length) { el.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:8px 0">Sem dados</div>'; return; }
+
+  const cats = {};
+  lista.forEach(t => {
+    const k = t.cat || '📦 Outros';
+    cats[k] = (cats[k]||0) + t.preco;
+  });
+  const sorted = Object.entries(cats).sort((a,b)=>b[1]-a[1]);
+  const max = sorted[0][1];
+  const colors = ['var(--p)','var(--cyan)','var(--green)','var(--gold)','var(--red)'];
+
+  el.innerHTML = sorted.map(([k,v],i) => `
+    <div class="cat-bar-row">
+      <div class="cat-bar-header">
+        <span class="cat-bar-name">${k}</span>
+        <span class="cat-bar-val">${fmtR(v)} (${total>0?Math.round(v/total*100):0}%)</span>
+      </div>
+      <div class="cat-bar-track">
+        <div class="cat-bar-fill" style="width:${max>0?Math.round(v/max*100):0}%;background:${colors[i%colors.length]}"></div>
+      </div>
+    </div>`).join('');
+}
+
+// ============================================================
+// MODAL
+// ============================================================
+function abrirModal(id) {
+  editId = id || null;
+  if (id) {
+    const t = txs.find(x=>x.id===id);
+    if (!t) return;
+    document.getElementById('sheetTitle').textContent = 'Editar';
+    setTipo(t.tipo);
+    document.getElementById('fNome').value  = t.nome;
+    document.getElementById('fPreco').value = t.preco;
+    document.getElementById('fCat').value   = t.cat||'';
+    document.getElementById('fData').value  = t.data||hoje();
+    document.getElementById('fNota').value  = t.nota||'';
+    t.foto ? setFotoPreview(t.foto) : rmFotoSilent();
+  } else {
+    document.getElementById('sheetTitle').textContent = 'Nova Transação';
+    resetForm();
+  }
+  document.getElementById('modalOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('fNome').focus(),300);
+}
+
+function fecharModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  resetForm();
+}
+
+function fecharModalClick(e) {
+  if (e.target===document.getElementById('modalOverlay')) fecharModal();
+}
+
+function resetForm() {
+  setTipo('venda');
+  ['fNome','fNota'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fPreco').value='';
+  document.getElementById('fCat').value='';
+  document.getElementById('fData').value=hoje();
+  rmFotoSilent();
+  editId=null;
+}
+
+function setTipo(t) {
+  tipoAtual=t;
+  document.getElementById('optV').className='type-opt'+(t==='venda'?' sel-v':'');
+  document.getElementById('optC').className='type-opt'+(t==='compra'?' sel-c':'');
+}
+
+// ============================================================
+// PHOTO
+// ============================================================
+function loadFoto(e) {
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=ev=>setFotoPreview(ev.target.result);
+  r.readAsDataURL(f);
+}
+
+function setFotoPreview(src) {
+  fotoAtual=src;
+  document.getElementById('phPreview').src=src;
+  document.getElementById('phPreview').style.display='block';
+  document.getElementById('phPlaceholder').style.display='none';
+  document.getElementById('phRemoveBtn').style.display='block';
+  document.getElementById('photoArea').classList.add('has-img');
+}
+
+function rmFoto(e) { e.stopPropagation(); rmFotoSilent(); }
+function rmFotoSilent() {
+  fotoAtual=null;
+  document.getElementById('phPreview').style.display='none';
+  document.getElementById('phPlaceholder').style.display='block';
+  document.getElementById('phRemoveBtn').style.display='none';
+  document.getElementById('photoArea').classList.remove('has-img');
+  document.getElementById('photoInp').value='';
+}
+
+// ============================================================
+// DELETE / CONFIRM
+// ============================================================
+function pedirDelete(id) {
+  deleteId=id;
+  confirmCallback = () => { deletar(id); deleteId=null; };
+  document.getElementById('ciIcon').textContent='🗑️';
+  document.getElementById('ciTitle').textContent='Excluir transação?';
+  document.getElementById('ciSub').textContent='Esta ação não pode ser desfeita.';
+  document.getElementById('ciConfirmBtn').textContent='Excluir';
+  document.getElementById('confirmOverlay').classList.add('open');
+}
+
+function pedirLimpar() {
+  if (!txs.length) return toast('Nada para limpar','err');
+  confirmCallback = async () => {
+    if (syncAtivo && db) {
+      const rid = localStorage.getItem('bric_roomId');
+      const snap = await db.collection('bric_'+rid).get();
+      const batch = db.batch();
+      snap.docs.forEach(d=>batch.delete(d.ref));
+      await batch.commit();
+    } else {
+      txs=[];
+      salvarLocal();
+      renderAll();
+    }
+    toast('🗑️ Histórico limpo','info');
+  };
+  document.getElementById('ciIcon').textContent='⚠️';
+  document.getElementById('ciTitle').textContent='Apagar tudo?';
+  document.getElementById('ciSub').textContent='Todas as transações serão excluídas permanentemente.';
+  document.getElementById('ciConfirmBtn').textContent='Apagar tudo';
+  document.getElementById('confirmOverlay').classList.add('open');
+}
+
+function confirmarAcao() { if(confirmCallback) confirmCallback(); fecharConfirm(); }
+function fecharConfirm() { document.getElementById('confirmOverlay').classList.remove('open'); confirmCallback=null; }
+function fecharConfirmClick(e) { if(e.target===document.getElementById('confirmOverlay')) fecharConfirm(); }
+
+function editarTx(id) { abrirModal(id); }
+
+// ============================================================
+// FILTERS / SORT
+// ============================================================
+function setFilter(f, el, cls) {
+  filterAtual=f;
+  document.querySelectorAll('.fbtn').forEach(b=>{b.classList.remove('on','v','c')});
+  el.classList.add('on');
+  if (cls) el.classList.add(cls);
+  renderTxList();
+}
+
+function setChartMode(m, el) {
+  chartMode=m;
+  document.querySelectorAll('.chart-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderChart();
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function navTo(page) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  const navEl = document.getElementById('nav-'+page);
+  if (navEl) navEl.classList.add('active');
+  if (page==='graphs') renderGraphs();
+}
+
+// ============================================================
+// EXPORT / IMPORT
+// ============================================================
+function exportCSV() {
+  if (!txs.length) return toast('Nada para exportar','err');
+  const h='Tipo,Nome,Preço,Categoria,Data,Observação\n';
+  const rows=txs.map(t=>`${t.tipo},"${t.nome}",${t.preco},"${t.cat||''}","${t.data||''}","${t.nota||''}"`).join('\n');
+  const blob=new Blob([h+rows],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='bric_'+hoje()+'.csv';a.click();
+  URL.revokeObjectURL(url);
+  toast('📥 CSV exportado!','ok');
+}
+
+function importarDados() { document.getElementById('importInput').click(); }
+
+function processarImport(e) {
+  const file=e.target.files[0]; if(!file) return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    const lines=ev.target.result.split('\n').slice(1);
+    let count=0;
+    lines.forEach(line=>{
+      if(!line.trim()) return;
+      const parts=line.match(/(".*?"|[^,]+)/g)||[];
+      const clean=parts.map(p=>p.replace(/^"|"$/g,''));
+      if(clean.length>=2 && clean[0] && clean[1]) {
+        txs.push({
+          id:Date.now().toString()+Math.random(),
+          tipo:clean[0]||'venda',nome:clean[1],preco:parseFloat(clean[2])||0,
+          cat:clean[3]||'',data:clean[4]||'',nota:clean[5]||'',foto:null,ts:Date.now()
+        });
+        count++;
+      }
+    });
+    salvarLocal();renderAll();
+    toast(`📤 ${count} transações importadas`,'ok');
+  };
+  r.readAsText(file,'utf-8');
+  e.target.value='';
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+let toastTimer;
+function toast(msg, type='ok') {
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.className='toast show '+type;
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),3200);
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function fmtR(v) {
+  if (v >= 1000) return 'R$ ' + v.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
+  return 'R$ ' + v.toFixed(2).replace('.',',');
+}
+
+function fmtData(d) {
+  if(!d) return '';
+  const [y,m,dia]=d.split('-');
+  return `${dia}/${m}`;
+}
+
+function hoje() { return new Date().toISOString().split('T')[0]; }
+
+// ============================================================
+// KEYBOARD
+// ============================================================
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape'){fecharModal();fecharConfirm();}
+  if((e.ctrlKey||e.metaKey)&&e.key==='n'){e.preventDefault();abrirModal();}
+});
+
+// ============================================================
+// PWA INSTALL PROMPT
+// ============================================================
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e=>{
+  e.preventDefault();
+  deferredPrompt=e;
+  setTimeout(()=>{
+    toast('📲 Instale o app: toque em ⋮ → "Adicionar à tela inicial"','info');
+  }, 3000);
+});
+</script>
+</body>
+</html>
