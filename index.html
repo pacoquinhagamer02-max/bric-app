@@ -548,7 +548,7 @@ main{max-width:600px;margin:0 auto;padding:16px 16px 0}
     <div class="st-sec">
       <div class="st-ttl">Sobre</div>
       <div class="st-card">
-        <div class="st-row" style="cursor:default"><div class="st-ico" style="background:rgba(139,92,246,.15)">💰</div><div class="st-body"><div class="st-t">Bric v2.1</div><div class="st-s">Controle de compras e vendas · PWA</div></div></div>
+        <div class="st-row" style="cursor:default"><div class="st-ico" style="background:rgba(139,92,246,.15)">💰</div><div class="st-body"><div class="st-t">Bric v3.0</div><div class="st-s">Compras, vendas e trocas · PWA</div></div></div>
       </div>
     </div>
     <input type="file" id="importInp" accept=".csv" style="display:none" onchange="processImport(event)">
@@ -892,8 +892,8 @@ function req(id, errId) {
   return ok;
 }
 function reqNum(id, errId) {
-  const v = num(id);
-  const ok = v > 0;
+  const raw = (document.getElementById(id).value || '').replace(',', '.').replace(/[^\d.]/g, '');
+  const ok  = raw !== '' && !isNaN(parseFloat(raw));
   document.getElementById(id).classList.toggle('err', !ok);
   document.getElementById(errId).classList.toggle('show', !ok);
   return ok;
@@ -964,7 +964,7 @@ async function salvar() {
       renderAll();
     }
     closeModal();
-    toast(editId ? '✏️ Atualizado!' : (tipo === 'venda' ? '💚 Venda registrada!' : '❤️ Compra registrada!'), 'ok');
+    toast(editId ? '✏️ Atualizado!' : (tipo === 'venda' ? '💚 Venda registrada!' : tipo === 'troca' ? '🔄 Troca registrada!' : '❤️ Compra registrada!'), 'ok');
     if (navigator.vibrate) navigator.vibrate(40);
   } catch(e) {
     toast('Erro ao salvar: ' + e.message, 'err');
@@ -1040,7 +1040,10 @@ function renderChart() {
     const d = new Date(t.data + 'T12:00:00').getTime();
     if (cutoff && d < cutoff) return;
     if (!byDate[t.data]) byDate[t.data] = { v: 0, c: 0 };
-    byDate[t.data][t.tipo === 'venda' ? 'v' : 'c'] += t.preco;
+    if (t.tipo === 'venda') byDate[t.data].v += t.preco;
+    else if (t.tipo === 'compra') byDate[t.data].c += t.preco;
+    // trocas: conta o custo no lado gasto e o valor recebido no lado venda
+    else { byDate[t.data].c += (t.custo || 0); byDate[t.data].v += (t.valRec || 0); }
   });
   const dates = Object.keys(byDate).sort();
   if (!dates.length) {
@@ -1319,7 +1322,7 @@ function editTx(e, id) { e.stopPropagation(); openModal(id); }
 // ─── FILTERS ─────────────────────────────────────────────────
 function setFilter(f, el, cls) {
   filterVal = f;
-  document.querySelectorAll('.fbtn').forEach(b => { b.classList.remove('on', 'vf', 'cf'); });
+  document.querySelectorAll('.fbtn').forEach(b => { b.classList.remove('on', 'vf', 'cf', 'tf'); });
   el.classList.add('on');
   if (cls) el.classList.add(cls);
   renderTxList();
@@ -1346,8 +1349,21 @@ function navTo(p) {
 // ─── EXPORT / IMPORT ─────────────────────────────────────────
 function exportCSV() {
   if (!txs.length) return toast('Nada para exportar', 'err');
-  const h = 'Tipo,Nome,Preço,Categoria,Data,Observação\n';
-  const rows = txs.map(t => t.tipo + ',"' + (t.nome || '') + '",' + t.preco + ',"' + (t.cat || '') + '","' + (t.data || '') + '","' + (t.nota || '') + '"').join('\n');
+  const h = 'Tipo,Nome,Preço,Custo,NomeDao,NomeRec,ValRec,Dif,DifTipo,Categoria,Data,Observação\n';
+  const rows = txs.map(t => [
+    t.tipo,
+    '"' + (t.nome || '') + '"',
+    t.preco || 0,
+    t.custo || 0,
+    '"' + (t.nomeDao || '') + '"',
+    '"' + (t.nomeRec || '') + '"',
+    t.valRec || 0,
+    t.dif || 0,
+    t.difTipo || '',
+    '"' + (t.cat || '') + '"',
+    '"' + (t.data || '') + '"',
+    '"' + (t.nota || '') + '"'
+  ].join(',')).join('\n');
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([h + rows], { type: 'text/csv;charset=utf-8;' }));
   a.download = 'bric_' + today() + '.csv';
@@ -1368,7 +1384,16 @@ function processImport(e) {
       const p = line.match(/(".*?"|[^,]+)/g) || [];
       const c = p.map(x => x.replace(/^"|"$/g, ''));
       if (c.length >= 2 && c[1]) {
-        txs.push({ id: Date.now() + '' + Math.random(), tipo: c[0] || 'venda', nome: c[1], preco: parseFloat(c[2]) || 0, cat: c[3] || '', data: c[4] || '', nota: c[5] || '', foto: null, ts: Date.now() });
+        txs.push({
+          id: Date.now() + '' + Math.random(),
+          tipo: c[0] || 'venda', nome: c[1],
+          preco: parseFloat(c[2]) || 0, custo: parseFloat(c[3]) || 0,
+          nomeDao: c[4] || '', nomeRec: c[5] || '',
+          valRec: parseFloat(c[6]) || 0, dif: parseFloat(c[7]) || 0,
+          difTipo: c[8] || 'zero',
+          cat: c[9] || '', data: c[10] || '', nota: c[11] || '',
+          foto: null, ts: Date.now()
+        });
         n++;
       }
     });
