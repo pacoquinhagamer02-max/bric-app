@@ -303,17 +303,23 @@ main{max-width:600px;margin:0 auto;padding:16px 16px 0}
 .type-opt.sv{border-color:var(--green);background:rgba(16,185,129,.12);color:var(--green)}
 .type-opt.sc{border-color:var(--red);background:rgba(239,68,68,.12);color:var(--red)}
 .type-opt.st{border-color:var(--cyan);background:rgba(6,182,212,.12);color:var(--cyan)}
-/* Troca extra fields */
+/* Troca fields */
 .troca-fields{display:none;flex-direction:column;gap:0}
 .troca-fields.show{display:flex}
+.troca-bloco{border-radius:12px;padding:14px;margin-bottom:12px}
+.troca-bloco.dao{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.22)}
+.troca-bloco.rec{background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.22)}
+.troca-bloco-ttl{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.troca-arrow{text-align:center;font-size:22px;margin:2px 0 10px;color:var(--text2)}
+.dif-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .lucro-preview{
-  background:linear-gradient(135deg,rgba(6,182,212,.15),rgba(13,148,136,.15));
-  border:1px solid rgba(6,182,212,.3);border-radius:10px;
-  padding:12px 14px;display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:15px;
+  background:linear-gradient(135deg,rgba(6,182,212,.12),rgba(13,148,136,.12));
+  border:1px solid rgba(6,182,212,.3);border-radius:11px;
+  padding:13px 15px;display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;
 }
 .lp-lbl{font-size:12px;color:var(--text2);font-weight:600}
-.lp-val{font-size:18px;font-weight:900}
+.lp-val{font-size:20px;font-weight:900}
 .lp-val.pos{color:var(--green)}.lp-val.neg{color:var(--red)}.lp-val.zero{color:var(--text2)}
 /* Troca badge */
 .badge.t{background:rgba(6,182,212,.15);color:var(--cyan);border:1px solid rgba(6,182,212,.3)}
@@ -579,15 +585,15 @@ main{max-width:600px;margin:0 auto;padding:16px 16px 0}
           <button class="type-opt" id="optT" type="button" onclick="setTipo('troca')">🔄 Troquei</button>
         </div>
       </div>
-      <!-- NOME -->
-      <div class="fg">
+      <!-- NOME (oculto em Troca) -->
+      <div class="fg" id="fgNome">
         <label class="flbl" for="fNome">Nome do Item *</label>
         <input class="fi" id="fNome" type="text" placeholder="Ex: Tênis Nike, iPhone, Placa de vídeo..." autocomplete="off" autocorrect="off">
         <div class="ferr" id="eNome">⚠️ Digite o nome do item</div>
       </div>
-      <!-- PREÇO -->
-      <div class="fg">
-        <label class="flbl" id="lblPreco" for="fPreco">Preço (R$) *</label>
+      <!-- PREÇO (oculto em Troca) -->
+      <div class="fg" id="fgPreco">
+        <label class="flbl" for="fPreco">Preço (R$) *</label>
         <div class="price-w">
           <span class="price-pre">R$</span>
           <input class="fi price" id="fPreco" type="text" inputmode="decimal" placeholder="0,00" autocomplete="off">
@@ -596,18 +602,62 @@ main{max-width:600px;margin:0 auto;padding:16px 16px 0}
       </div>
       <!-- CAMPOS EXCLUSIVOS DE TROCA -->
       <div class="troca-fields" id="trocaFields">
-        <div class="fg">
-          <label class="flbl" for="fCusto">Custo da troca (R$) *</label>
-          <div class="price-w">
-            <span class="price-pre">R$</span>
-            <input class="fi price" id="fCusto" type="text" inputmode="decimal" placeholder="0,00" autocomplete="off">
+        <!-- MEU ITEM -->
+        <div class="troca-bloco dao">
+          <div class="troca-bloco-ttl">📤 <span>Meu item — o que vou dar</span></div>
+          <div class="fg" style="margin-bottom:10px">
+            <label class="flbl" for="fNomeDao">Nome do meu item *</label>
+            <input class="fi" id="fNomeDao" type="text" placeholder="Ex: Xbox One, iPhone 11..." autocomplete="off">
+            <div class="ferr" id="eNomeDao">⚠️ Digite o nome do seu item</div>
           </div>
-          <div class="ferr" id="eCusto">⚠️ Digite o custo da troca</div>
+          <div class="fg" style="margin-bottom:0">
+            <label class="flbl" for="fCustoMeu">Quanto paguei nele (R$) *</label>
+            <div class="price-w">
+              <span class="price-pre">R$</span>
+              <input class="fi price" id="fCustoMeu" type="text" inputmode="decimal" placeholder="0,00" autocomplete="off">
+            </div>
+            <div class="ferr" id="eCustoMeu">⚠️ Digite o valor que você pagou</div>
+          </div>
         </div>
-        <div class="lucro-preview" id="lucroPreview">
+        <!-- SETA -->
+        <div class="troca-arrow">⇄</div>
+        <!-- ITEM RECEBIDO -->
+        <div class="troca-bloco rec">
+          <div class="troca-bloco-ttl">📥 <span>Item que vou receber</span></div>
+          <div class="fg" style="margin-bottom:10px">
+            <label class="flbl" for="fNomeRec">Nome do item recebido *</label>
+            <input class="fi" id="fNomeRec" type="text" placeholder="Ex: PS3, Samsung S22..." autocomplete="off">
+            <div class="ferr" id="eNomeRec">⚠️ Digite o nome do item recebido</div>
+          </div>
+          <div class="fg" style="margin-bottom:0">
+            <label class="flbl" for="fValRec">Valor do item recebido (R$) *</label>
+            <div class="price-w">
+              <span class="price-pre">R$</span>
+              <input class="fi price" id="fValRec" type="text" inputmode="decimal" placeholder="0,00" autocomplete="off">
+            </div>
+            <div class="ferr" id="eValRec">⚠️ Digite o valor do item recebido</div>
+          </div>
+        </div>
+        <!-- DIFERENÇA -->
+        <div class="fg">
+          <label class="flbl">Diferença em dinheiro</label>
+          <div class="dif-row">
+            <select class="fi" id="fDifTipo" onchange="atualizarLucroPreview()">
+              <option value="zero">Sem diferença</option>
+              <option value="rec">Vou RECEBER R$</option>
+              <option value="pag">Vou PAGAR R$</option>
+            </select>
+            <div class="price-w">
+              <span class="price-pre">R$</span>
+              <input class="fi price" id="fDif" type="text" inputmode="decimal" placeholder="0,00" autocomplete="off" oninput="atualizarLucroPreview()">
+            </div>
+          </div>
+        </div>
+        <!-- PREVIEW DE LUCRO -->
+        <div class="lucro-preview">
           <div>
             <div class="lp-lbl">💡 Lucro estimado da troca</div>
-            <div style="font-size:11px;color:var(--text2);margin-top:2px">Valor de venda − custo da troca</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:2px" id="lpFormula">—</div>
           </div>
           <div class="lp-val zero" id="lpVal">R$ 0</div>
         </div>
@@ -813,47 +863,76 @@ function copiarRoom() {
 // ─── CRUD ────────────────────────────────────────────────────
 function atualizarLucroPreview() {
   if (tipo !== 'troca') return;
-  const venda = parseFloat(document.getElementById('fPreco').value.replace(',', '.').replace(/[^\d.]/g, '')) || 0;
-  const custo = parseFloat(document.getElementById('fCusto').value.replace(',', '.').replace(/[^\d.]/g, '')) || 0;
-  const lucro = venda - custo;
-  const el = document.getElementById('lpVal');
-  el.textContent = fmt(lucro);
-  el.className = 'lp-val ' + (lucro > 0 ? 'pos' : lucro < 0 ? 'neg' : 'zero');
+  const custoMeu  = num('fCustoMeu');
+  const valRec    = num('fValRec');
+  const difTipo   = document.getElementById('fDifTipo').value;
+  const difVal    = num('fDif');
+  const dif       = difTipo === 'rec' ? difVal : difTipo === 'pag' ? -difVal : 0;
+  const lucro     = valRec + dif - custoMeu;
+  const el        = document.getElementById('lpVal');
+  const formula   = document.getElementById('lpFormula');
+  el.textContent  = fmt(lucro);
+  el.className    = 'lp-val ' + (lucro > 0 ? 'pos' : lucro < 0 ? 'neg' : 'zero');
+  const parts = [];
+  if (valRec)    parts.push('R$' + valRec.toFixed(0));
+  if (dif > 0)   parts.push('+ R$' + dif.toFixed(0) + ' recebido');
+  if (dif < 0)   parts.push('− R$' + Math.abs(dif).toFixed(0) + ' pago');
+  if (custoMeu)  parts.push('− R$' + custoMeu.toFixed(0) + ' custo');
+  formula.textContent = parts.join(' ') || '—';
+}
+
+// helper: parse R$ field
+function num(id) {
+  return parseFloat((document.getElementById(id).value || '').replace(',', '.').replace(/[^\d.]/g, '')) || 0;
+}
+function req(id, errId) {
+  const ok = document.getElementById(id).value.trim() !== '';
+  document.getElementById(id).classList.toggle('err', !ok);
+  document.getElementById(errId).classList.toggle('show', !ok);
+  return ok;
+}
+function reqNum(id, errId) {
+  const v = num(id);
+  const ok = v > 0;
+  document.getElementById(id).classList.toggle('err', !ok);
+  document.getElementById(errId).classList.toggle('show', !ok);
+  return ok;
 }
 
 async function salvar() {
-  const nome = document.getElementById('fNome').value.trim();
-  const precoRaw = document.getElementById('fPreco').value.replace(',', '.').replace(/[^\d.]/g, '');
-  const preco = parseFloat(precoRaw);
-  const custoRaw = tipo === 'troca' ? document.getElementById('fCusto').value.replace(',', '.').replace(/[^\d.]/g, '') : '0';
-  const custo = parseFloat(custoRaw) || 0;
-
   let valid = true;
-  if (!nome) {
-    document.getElementById('fNome').classList.add('err');
-    document.getElementById('eNome').classList.add('show');
-    valid = false;
+  let nome, preco, custo = 0, nomeDao = '', nomeRec = '', valRec = 0, dif = 0, difTipo = 'zero';
+
+  if (tipo === 'troca') {
+    valid = req('fNomeDao','eNomeDao') && valid;
+    valid = reqNum('fCustoMeu','eCustoMeu') && valid;
+    valid = req('fNomeRec','eNomeRec') && valid;
+    valid = reqNum('fValRec','eValRec') && valid;
+    if (!valid) return;
+    nomeDao  = document.getElementById('fNomeDao').value.trim();
+    nomeRec  = document.getElementById('fNomeRec').value.trim();
+    custo    = num('fCustoMeu');
+    valRec   = num('fValRec');
+    difTipo  = document.getElementById('fDifTipo').value;
+    const difVal = num('fDif');
+    dif      = difTipo === 'rec' ? difVal : difTipo === 'pag' ? -difVal : 0;
+    preco    = valRec + dif;            // total recebido (base p/ lucro = preco - custo)
+    nome     = nomeDao + ' ↔ ' + nomeRec;
   } else {
-    document.getElementById('fNome').classList.remove('err');
-    document.getElementById('eNome').classList.remove('show');
+    const precoRaw = (document.getElementById('fPreco').value || '').replace(',', '.').replace(/[^\d.]/g, '');
+    valid = req('fNome','eNome') && valid;
+    if (!precoRaw || parseFloat(precoRaw) <= 0) {
+      document.getElementById('fPreco').classList.add('err');
+      document.getElementById('ePreco').classList.add('show');
+      valid = false;
+    } else {
+      document.getElementById('fPreco').classList.remove('err');
+      document.getElementById('ePreco').classList.remove('show');
+    }
+    if (!valid) return;
+    nome  = document.getElementById('fNome').value.trim();
+    preco = parseFloat((document.getElementById('fPreco').value || '').replace(',', '.').replace(/[^\d.]/g, ''));
   }
-  if (!precoRaw || isNaN(preco) || preco <= 0) {
-    document.getElementById('fPreco').classList.add('err');
-    document.getElementById('ePreco').classList.add('show');
-    valid = false;
-  } else {
-    document.getElementById('fPreco').classList.remove('err');
-    document.getElementById('ePreco').classList.remove('show');
-  }
-  if (tipo === 'troca' && (!custoRaw || isNaN(custo) || custo <= 0)) {
-    document.getElementById('fCusto').classList.add('err');
-    document.getElementById('eCusto').classList.add('show');
-    valid = false;
-  } else {
-    document.getElementById('fCusto').classList.remove('err');
-    document.getElementById('eCusto').classList.remove('show');
-  }
-  if (!valid) return;
 
   const btn = document.getElementById('btnSave');
   btn.disabled = true;
@@ -861,11 +940,9 @@ async function salvar() {
 
   const t = {
     id: editId || Date.now().toString(),
-    tipo,
-    nome,
-    preco,
-    custo: tipo === 'troca' ? custo : 0,
-    cat: document.getElementById('fCat').value,
+    tipo, nome, preco, custo,
+    nomeDao, nomeRec, valRec, dif, difTipo,
+    cat:  document.getElementById('fCat').value,
     data: document.getElementById('fData').value,
     nota: document.getElementById('fNota').value.trim(),
     foto: foto,
@@ -1013,8 +1090,18 @@ function txCard(t, mini) {
   const acts = mini ? '' : '<div class="tx-acts"><button class="abt e" onclick="editTx(event,\'' + t.id + '\')" title="Editar">✏️</button><button class="abt d" onclick="askDelete(event,\'' + t.id + '\')" title="Excluir">🗑️</button></div>';
   const badgeTxt = t.tipo === 'venda' ? 'Vendido' : isTroca ? 'Troca' : 'Comprado';
   const lucroTroca = isTroca ? (t.preco - (t.custo || 0)) : 0;
+  let detailHtml = '';
+  if (isTroca) {
+    const difLabel = t.difTipo === 'rec' ? '+ R$' + fmt(t.dif||0).replace('R$','') + ' rec.'
+                   : t.difTipo === 'pag' ? '− R$' + fmt(Math.abs(t.dif||0)).replace('R$','') + ' pago'
+                   : '';
+    detailHtml = '<div style="font-size:10px;color:var(--text2);text-align:right;line-height:1.5">'
+      + fmt(t.valRec||0) + ' rec.'
+      + (difLabel ? ' ' + difLabel : '')
+      + ' − ' + fmt(t.custo||0) + ' custo</div>';
+  }
   const precoHtml = isTroca
-    ? '<div class="tx-price t">+' + fmt(lucroTroca) + '</div><div style="font-size:10px;color:var(--text2);text-align:right">venda ' + fmt(t.preco) + ' / custo ' + fmt(t.custo || 0) + '</div>'
+    ? '<div class="tx-price t">' + (lucroTroca >= 0 ? '+' : '') + fmt(lucroTroca) + '</div>' + detailHtml
     : '<div class="tx-price ' + tipoClass + '">' + (t.tipo === 'venda' ? '+' : '-') + fmt(t.preco) + '</div>';
   return '<div class="txc ' + tipoClass + '">' +
     imgHtml +
@@ -1063,14 +1150,22 @@ function openModal(id) {
     if (!t) return;
     document.getElementById('sheetTtl').textContent = 'Editar';
     setTipo(t.tipo);
-    document.getElementById('fNome').value  = t.nome;
-    document.getElementById('fPreco').value = String(t.preco).replace('.', ',');
-    document.getElementById('fCusto').value = t.custo ? String(t.custo).replace('.', ',') : '';
-    document.getElementById('fCat').value   = t.cat || '';
+    if (t.tipo === 'troca') {
+      document.getElementById('fNomeDao').value  = t.nomeDao || '';
+      document.getElementById('fCustoMeu').value = t.custo   ? String(t.custo).replace('.', ',') : '';
+      document.getElementById('fNomeRec').value  = t.nomeRec || '';
+      document.getElementById('fValRec').value   = t.valRec  ? String(t.valRec).replace('.', ',') : '';
+      document.getElementById('fDifTipo').value  = t.difTipo || 'zero';
+      document.getElementById('fDif').value      = t.dif     ? String(Math.abs(t.dif)).replace('.', ',') : '';
+      atualizarLucroPreview();
+    } else {
+      document.getElementById('fNome').value  = t.nome;
+      document.getElementById('fPreco').value = String(t.preco).replace('.', ',');
+    }
+    document.getElementById('fCat').value   = t.cat  || '';
     document.getElementById('fData').value  = t.data || today();
     document.getElementById('fNota').value  = t.nota || '';
     if (t.foto) setFotoPreview(t.foto); else rmFotoSilent();
-    atualizarLucroPreview();
   } else {
     document.getElementById('sheetTtl').textContent = 'Nova Transação';
     resetForm();
@@ -1078,7 +1173,10 @@ function openModal(id) {
   clearErrors();
   document.getElementById('modalOv').classList.add('open');
   document.body.style.overflow = 'hidden';
-  setTimeout(() => document.getElementById('fNome').focus(), 350);
+  setTimeout(() => {
+    const first = tipo === 'troca' ? 'fNomeDao' : 'fNome';
+    document.getElementById(first).focus();
+  }, 350);
 }
 
 function closeModal() {
@@ -1091,7 +1189,6 @@ function resetForm() {
   setTipo('venda');
   document.getElementById('fNome').value  = '';
   document.getElementById('fPreco').value = '';
-  document.getElementById('fCusto').value = '';
   document.getElementById('fCat').value   = '';
   document.getElementById('fData').value  = today();
   document.getElementById('fNota').value  = '';
@@ -1103,10 +1200,10 @@ function resetForm() {
 }
 
 function clearErrors() {
-  ['fNome', 'fPreco', 'fCusto'].forEach(id => {
+  ['fNome','fPreco','fNomeDao','fCustoMeu','fNomeRec','fValRec'].forEach(id => {
     document.getElementById(id).classList.remove('err');
   });
-  ['eNome', 'ePreco', 'eCusto'].forEach(id => {
+  ['eNome','ePreco','eNomeDao','eCustoMeu','eNomeRec','eValRec'].forEach(id => {
     document.getElementById(id).classList.remove('show');
   });
 }
@@ -1117,14 +1214,22 @@ function setTipo(t) {
   document.getElementById('optC').className = 'type-opt' + (t === 'compra' ? ' sc' : '');
   document.getElementById('optT').className = 'type-opt' + (t === 'troca' ? ' st' : '');
   const isTroca = t === 'troca';
+  document.getElementById('fgNome').style.display  = isTroca ? 'none' : '';
+  document.getElementById('fgPreco').style.display = isTroca ? 'none' : '';
   document.getElementById('trocaFields').classList.toggle('show', isTroca);
-  document.getElementById('lblPreco').textContent = isTroca ? 'Valor de venda da troca (R$) *' : 'Preço (R$) *';
-  if (!isTroca) {
-    document.getElementById('fCusto').value = '';
-    document.getElementById('fCusto').classList.remove('err');
-    document.getElementById('eCusto').classList.remove('show');
-  }
-  atualizarLucroPreview();
+  if (!isTroca) clearTrocaFields();
+  else atualizarLucroPreview();
+}
+
+function clearTrocaFields() {
+  ['fNomeDao','fCustoMeu','fNomeRec','fValRec','fDif'].forEach(id => {
+    document.getElementById(id).value = '';
+    document.getElementById(id).classList.remove('err');
+  });
+  document.getElementById('fDifTipo').value = 'zero';
+  ['eNomeDao','eCustoMeu','eNomeRec','eValRec'].forEach(id =>
+    document.getElementById(id).classList.remove('show')
+  );
 }
 
 // ─── PHOTO ───────────────────────────────────────────────────
@@ -1322,10 +1427,19 @@ document.getElementById('fPreco').addEventListener('input', () => {
   document.getElementById('ePreco').classList.remove('show');
   atualizarLucroPreview();
 });
-document.getElementById('fCusto').addEventListener('input', () => {
-  document.getElementById('fCusto').classList.remove('err');
-  document.getElementById('eCusto').classList.remove('show');
-  atualizarLucroPreview();
+// Troca field listeners
+[['fNomeDao','eNomeDao'],['fNomeRec','eNomeRec']].forEach(([f,e]) => {
+  document.getElementById(f).addEventListener('input', () => {
+    document.getElementById(f).classList.remove('err');
+    document.getElementById(e).classList.remove('show');
+  });
+});
+[['fCustoMeu','eCustoMeu'],['fValRec','eValRec']].forEach(([f,e]) => {
+  document.getElementById(f).addEventListener('input', () => {
+    document.getElementById(f).classList.remove('err');
+    document.getElementById(e).classList.remove('show');
+    atualizarLucroPreview();
+  });
 });
 
 // ─── PWA INSTALL HINT ────────────────────────────────────────
