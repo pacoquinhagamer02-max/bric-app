@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bric-v2';
+const CACHE_NAME = 'bric-v3';
 const ASSETS = ['./', './index.html', './manifest.json'];
 
 self.addEventListener('install', e => {
