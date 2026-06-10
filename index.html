@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>
 :root{
-  --p:#8b5cf6;--p2:#7c3aed;--cyan:#06b6d4;
+  --p:#8b5cf6;--p2:#7c3aed;--cyan:#06b6d4;--teal:#0d9488;
   --green:#10b981;--red:#ef4444;--gold:#f59e0b;
   --bg:#0a0a0f;--bg2:#13131f;--bg3:#1a1a2e;--bg4:#252540;
   --border:rgba(139,92,246,.18);--border2:rgba(255,255,255,.08);
@@ -156,6 +156,7 @@ main{max-width:600px;margin:0 auto;padding:16px 16px 0}
 .fbtn.on{background:var(--p);border-color:var(--p);color:#fff}
 .fbtn.on.vf{background:var(--green);border-color:var(--green)}
 .fbtn.on.cf{background:var(--red);border-color:var(--red)}
+.fbtn.on.tf{background:var(--cyan);border-color:var(--cyan)}
 .srchwrap{position:relative;margin-bottom:10px}
 .srch-ico{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none}
 .srch{width:100%;background:var(--bg2);border:1.5px solid var(--border2);border-radius:10px;color:var(--text);padding:10px 12px 10px 32px;font-size:13px;outline:none;transition:border-color .2s}
@@ -292,15 +293,35 @@ main{max-width:600px;margin:0 auto;padding:16px 16px 0}
 .price-w{position:relative}
 .price-pre{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:15px;font-weight:700;color:var(--text2);pointer-events:none}
 .fi.price{padding-left:38px}
-.type-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.type-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 .type-opt{
-  padding:13px;border-radius:11px;border:2px solid var(--border2);
+  padding:11px 6px;border-radius:11px;border:2px solid var(--border2);
   background:var(--bg3);color:var(--text2);cursor:pointer;
-  font-size:14px;font-weight:700;transition:all .2s;
-  display:flex;align-items:center;justify-content:center;gap:7px;
+  font-size:13px;font-weight:700;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:5px;
 }
 .type-opt.sv{border-color:var(--green);background:rgba(16,185,129,.12);color:var(--green)}
 .type-opt.sc{border-color:var(--red);background:rgba(239,68,68,.12);color:var(--red)}
+.type-opt.st{border-color:var(--cyan);background:rgba(6,182,212,.12);color:var(--cyan)}
+/* Troca extra fields */
+.troca-fields{display:none;flex-direction:column;gap:0}
+.troca-fields.show{display:flex}
+.lucro-preview{
+  background:linear-gradient(135deg,rgba(6,182,212,.15),rgba(13,148,136,.15));
+  border:1px solid rgba(6,182,212,.3);border-radius:10px;
+  padding:12px 14px;display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:15px;
+}
+.lp-lbl{font-size:12px;color:var(--text2);font-weight:600}
+.lp-val{font-size:18px;font-weight:900}
+.lp-val.pos{color:var(--green)}.lp-val.neg{color:var(--red)}.lp-val.zero{color:var(--text2)}
+/* Troca badge */
+.badge.t{background:rgba(6,182,212,.15);color:var(--cyan);border:1px solid rgba(6,182,212,.3)}
+.txc.t::before{background:var(--cyan)}
+.tx-price.t{color:var(--cyan)}
+/* mini-card teal */
+.mc.tl::before{background:linear-gradient(90deg,var(--cyan),var(--teal))}
+.mc.tl .mc-val{color:var(--cyan)}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .photo-area{
   border:2px dashed var(--border2);border-radius:11px;padding:20px;
@@ -403,7 +424,7 @@ main{max-width:600px;margin:0 auto;padding:16px 16px 0}
     <div class="mcards">
       <div class="mc g"><div class="mc-lbl">💚 Vendido</div><div class="mc-val" id="mcV">R$ 0</div><div class="mc-sub" id="mcVq">0 vendas</div></div>
       <div class="mc r"><div class="mc-lbl">❤️ Gasto</div><div class="mc-val" id="mcC">R$ 0</div><div class="mc-sub" id="mcCq">0 compras</div></div>
-      <div class="mc b"><div class="mc-lbl">📦 Itens</div><div class="mc-val" id="mcI">0</div><div class="mc-sub">transações</div></div>
+      <div class="mc tl"><div class="mc-lbl">🔄 Trocas</div><div class="mc-val" id="mcTr">R$ 0</div><div class="mc-sub" id="mcTrq">0 trocas</div></div>
       <div class="mc y"><div class="mc-lbl">💛 Ticket Médio</div><div class="mc-val" id="mcT">R$ 0</div><div class="mc-sub">por item</div></div>
     </div>
     <div class="chart-card">
@@ -434,6 +455,7 @@ main{max-width:600px;margin:0 auto;padding:16px 16px 0}
       <button class="fbtn on" id="fa0" onclick="setFilter('all',this,'')">Todas</button>
       <button class="fbtn" id="fa1" onclick="setFilter('venda',this,'vf')">💚 Vendas</button>
       <button class="fbtn" id="fa2" onclick="setFilter('compra',this,'cf')">❤️ Compras</button>
+      <button class="fbtn" id="fa3" onclick="setFilter('troca',this,'tf')">🔄 Trocas</button>
     </div>
     <div class="srchwrap">
       <span class="srch-ico">🔍</span>
@@ -554,6 +576,7 @@ main{max-width:600px;margin:0 auto;padding:16px 16px 0}
         <div class="type-row">
           <button class="type-opt sv" id="optV" type="button" onclick="setTipo('venda')">💚 Vendi</button>
           <button class="type-opt" id="optC" type="button" onclick="setTipo('compra')">❤️ Comprei</button>
+          <button class="type-opt" id="optT" type="button" onclick="setTipo('troca')">🔄 Troquei</button>
         </div>
       </div>
       <!-- NOME -->
@@ -564,12 +587,30 @@ main{max-width:600px;margin:0 auto;padding:16px 16px 0}
       </div>
       <!-- PREÇO -->
       <div class="fg">
-        <label class="flbl" for="fPreco">Preço (R$) *</label>
+        <label class="flbl" id="lblPreco" for="fPreco">Preço (R$) *</label>
         <div class="price-w">
           <span class="price-pre">R$</span>
           <input class="fi price" id="fPreco" type="text" inputmode="decimal" placeholder="0,00" autocomplete="off">
         </div>
-        <div class="ferr" id="ePreco">⚠️ Digite um preço válido (ex: 150 ou 150,50)</div>
+        <div class="ferr" id="ePreco">⚠️ Digite um valor válido (ex: 150 ou 150,50)</div>
+      </div>
+      <!-- CAMPOS EXCLUSIVOS DE TROCA -->
+      <div class="troca-fields" id="trocaFields">
+        <div class="fg">
+          <label class="flbl" for="fCusto">Custo da troca (R$) *</label>
+          <div class="price-w">
+            <span class="price-pre">R$</span>
+            <input class="fi price" id="fCusto" type="text" inputmode="decimal" placeholder="0,00" autocomplete="off">
+          </div>
+          <div class="ferr" id="eCusto">⚠️ Digite o custo da troca</div>
+        </div>
+        <div class="lucro-preview" id="lucroPreview">
+          <div>
+            <div class="lp-lbl">💡 Lucro estimado da troca</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:2px">Valor de venda − custo da troca</div>
+          </div>
+          <div class="lp-val zero" id="lpVal">R$ 0</div>
+        </div>
       </div>
       <!-- CATEGORIA + DATA -->
       <div class="fg row2">
@@ -770,13 +811,24 @@ function copiarRoom() {
 }
 
 // ─── CRUD ────────────────────────────────────────────────────
+function atualizarLucroPreview() {
+  if (tipo !== 'troca') return;
+  const venda = parseFloat(document.getElementById('fPreco').value.replace(',', '.').replace(/[^\d.]/g, '')) || 0;
+  const custo = parseFloat(document.getElementById('fCusto').value.replace(',', '.').replace(/[^\d.]/g, '')) || 0;
+  const lucro = venda - custo;
+  const el = document.getElementById('lpVal');
+  el.textContent = fmt(lucro);
+  el.className = 'lp-val ' + (lucro > 0 ? 'pos' : lucro < 0 ? 'neg' : 'zero');
+}
+
 async function salvar() {
   const nome = document.getElementById('fNome').value.trim();
   const precoRaw = document.getElementById('fPreco').value.replace(',', '.').replace(/[^\d.]/g, '');
   const preco = parseFloat(precoRaw);
+  const custoRaw = tipo === 'troca' ? document.getElementById('fCusto').value.replace(',', '.').replace(/[^\d.]/g, '') : '0';
+  const custo = parseFloat(custoRaw) || 0;
 
   let valid = true;
-  // Validate nome
   if (!nome) {
     document.getElementById('fNome').classList.add('err');
     document.getElementById('eNome').classList.add('show');
@@ -785,7 +837,6 @@ async function salvar() {
     document.getElementById('fNome').classList.remove('err');
     document.getElementById('eNome').classList.remove('show');
   }
-  // Validate preco
   if (!precoRaw || isNaN(preco) || preco <= 0) {
     document.getElementById('fPreco').classList.add('err');
     document.getElementById('ePreco').classList.add('show');
@@ -793,6 +844,14 @@ async function salvar() {
   } else {
     document.getElementById('fPreco').classList.remove('err');
     document.getElementById('ePreco').classList.remove('show');
+  }
+  if (tipo === 'troca' && (!custoRaw || isNaN(custo) || custo <= 0)) {
+    document.getElementById('fCusto').classList.add('err');
+    document.getElementById('eCusto').classList.add('show');
+    valid = false;
+  } else {
+    document.getElementById('fCusto').classList.remove('err');
+    document.getElementById('eCusto').classList.remove('show');
   }
   if (!valid) return;
 
@@ -805,6 +864,7 @@ async function salvar() {
     tipo,
     nome,
     preco,
+    custo: tipo === 'troca' ? custo : 0,
     cat: document.getElementById('fCat').value,
     data: document.getElementById('fData').value,
     nota: document.getElementById('fNota').value.trim(),
@@ -859,21 +919,27 @@ function renderAll() {
 }
 
 function renderDash() {
-  const v = txs.filter(t => t.tipo === 'venda');
-  const c = txs.filter(t => t.tipo === 'compra');
+  const v  = txs.filter(t => t.tipo === 'venda');
+  const c  = txs.filter(t => t.tipo === 'compra');
+  const tr = txs.filter(t => t.tipo === 'troca');
   const tv = v.reduce((s, t) => s + t.preco, 0);
   const tc = c.reduce((s, t) => s + t.preco, 0);
-  const lq = tv - tc;
+  const ttr = tr.reduce((s, t) => s + (t.preco - (t.custo || 0)), 0); // lucro líquido das trocas
+  const lq = tv - tc + ttr;
 
   document.getElementById('pcVal').textContent = fmt(lq);
   document.getElementById('pcVal').style.color = lq < 0 ? '#fca5a5' : '#fff';
-  document.getElementById('pcSub').textContent = txs.length
-    ? v.length + ' venda' + (v.length !== 1 ? 's' : '') + ' · ' + c.length + ' compra' + (c.length !== 1 ? 's' : '')
-    : 'Adicione sua primeira transação →';
+  const partes = [];
+  if (v.length) partes.push(v.length + ' venda' + (v.length !== 1 ? 's' : ''));
+  if (c.length) partes.push(c.length + ' compra' + (c.length !== 1 ? 's' : ''));
+  if (tr.length) partes.push(tr.length + ' troca' + (tr.length !== 1 ? 's' : ''));
+  document.getElementById('pcSub').textContent = partes.length ? partes.join(' · ') : 'Adicione sua primeira transação →';
   document.getElementById('pcTrend').textContent = lq > 0 ? '📈 Positivo' : lq < 0 ? '📉 Negativo' : '⚖️ Zero';
 
   document.getElementById('mcV').textContent = fmt(tv);
   document.getElementById('mcC').textContent = fmt(tc);
+  document.getElementById('mcTr').textContent = fmt(ttr);
+  document.getElementById('mcTrq').textContent = tr.length + ' troca' + (tr.length !== 1 ? 's' : '');
   document.getElementById('mcI').textContent = txs.length;
   document.getElementById('mcT').textContent = txs.length ? fmt((tv + tc) / txs.length) : 'R$ 0';
   document.getElementById('mcVq').textContent = v.length + ' venda' + (v.length !== 1 ? 's' : '');
@@ -937,16 +1003,23 @@ function renderTxList() {
 }
 
 function txCard(t, mini) {
+  const isTroca = t.tipo === 'troca';
+  const tipoClass = t.tipo === 'venda' ? 'v' : isTroca ? 't' : 'c';
+  const emoji = t.tipo === 'venda' ? '💚' : isTroca ? '🔄' : '❤️';
   const imgHtml = t.foto
     ? '<div class="tx-img"><img src="' + t.foto + '" alt="' + t.nome + '" loading="lazy"></div>'
-    : '<div class="tx-img">' + (t.tipo === 'venda' ? '💚' : '❤️') + '</div>';
+    : '<div class="tx-img">' + emoji + '</div>';
   const catHtml = t.cat ? '<span class="tx-cat">' + t.cat.replace(/^\S+\s/, '') + '</span>' : '';
   const acts = mini ? '' : '<div class="tx-acts"><button class="abt e" onclick="editTx(event,\'' + t.id + '\')" title="Editar">✏️</button><button class="abt d" onclick="askDelete(event,\'' + t.id + '\')" title="Excluir">🗑️</button></div>';
-  const sinal = t.tipo === 'venda' ? '+' : '-';
-  return '<div class="txc ' + (t.tipo === 'venda' ? 'v' : 'c') + '">' +
+  const badgeTxt = t.tipo === 'venda' ? 'Vendido' : isTroca ? 'Troca' : 'Comprado';
+  const lucroTroca = isTroca ? (t.preco - (t.custo || 0)) : 0;
+  const precoHtml = isTroca
+    ? '<div class="tx-price t">+' + fmt(lucroTroca) + '</div><div style="font-size:10px;color:var(--text2);text-align:right">venda ' + fmt(t.preco) + ' / custo ' + fmt(t.custo || 0) + '</div>'
+    : '<div class="tx-price ' + tipoClass + '">' + (t.tipo === 'venda' ? '+' : '-') + fmt(t.preco) + '</div>';
+  return '<div class="txc ' + tipoClass + '">' +
     imgHtml +
-    '<div class="tx-body"><div class="tx-name">' + esc(t.nome) + '</div><div class="tx-meta"><span class="badge ' + (t.tipo === 'venda' ? 'v' : 'c') + '">' + (t.tipo === 'venda' ? 'Vendido' : 'Comprado') + '</span>' + catHtml + (t.data ? '<span class="tx-date">' + fmtDate(t.data) + '</span>' : '') + '</div>' + (t.nota ? '<div class="tx-note">💬 ' + esc(t.nota) + '</div>' : '') + '</div>' +
-    '<div class="tx-right"><div class="tx-price ' + (t.tipo === 'venda' ? 'v' : 'c') + '">' + sinal + fmt(t.preco) + '</div>' + acts + '</div></div>';
+    '<div class="tx-body"><div class="tx-name">' + esc(t.nome) + '</div><div class="tx-meta"><span class="badge ' + tipoClass + '">' + badgeTxt + '</span>' + catHtml + (t.data ? '<span class="tx-date">' + fmtDate(t.data) + '</span>' : '') + '</div>' + (t.nota ? '<div class="tx-note">💬 ' + esc(t.nota) + '</div>' : '') + '</div>' +
+    '<div class="tx-right">' + precoHtml + acts + '</div></div>';
 }
 
 function renderGraphs() {
@@ -990,12 +1063,14 @@ function openModal(id) {
     if (!t) return;
     document.getElementById('sheetTtl').textContent = 'Editar';
     setTipo(t.tipo);
-    document.getElementById('fNome').value = t.nome;
+    document.getElementById('fNome').value  = t.nome;
     document.getElementById('fPreco').value = String(t.preco).replace('.', ',');
-    document.getElementById('fCat').value = t.cat || '';
-    document.getElementById('fData').value = t.data || today();
-    document.getElementById('fNota').value = t.nota || '';
+    document.getElementById('fCusto').value = t.custo ? String(t.custo).replace('.', ',') : '';
+    document.getElementById('fCat').value   = t.cat || '';
+    document.getElementById('fData').value  = t.data || today();
+    document.getElementById('fNota').value  = t.nota || '';
     if (t.foto) setFotoPreview(t.foto); else rmFotoSilent();
+    atualizarLucroPreview();
   } else {
     document.getElementById('sheetTtl').textContent = 'Nova Transação';
     resetForm();
@@ -1014,11 +1089,12 @@ function closeModal() {
 
 function resetForm() {
   setTipo('venda');
-  document.getElementById('fNome').value = '';
+  document.getElementById('fNome').value  = '';
   document.getElementById('fPreco').value = '';
-  document.getElementById('fCat').value = '';
-  document.getElementById('fData').value = today();
-  document.getElementById('fNota').value = '';
+  document.getElementById('fCusto').value = '';
+  document.getElementById('fCat').value   = '';
+  document.getElementById('fData').value  = today();
+  document.getElementById('fNota').value  = '';
   rmFotoSilent();
   clearErrors();
   editId = null;
@@ -1027,17 +1103,28 @@ function resetForm() {
 }
 
 function clearErrors() {
-  ['fNome', 'fPreco'].forEach(id => {
+  ['fNome', 'fPreco', 'fCusto'].forEach(id => {
     document.getElementById(id).classList.remove('err');
   });
-  document.getElementById('eNome').classList.remove('show');
-  document.getElementById('ePreco').classList.remove('show');
+  ['eNome', 'ePreco', 'eCusto'].forEach(id => {
+    document.getElementById(id).classList.remove('show');
+  });
 }
 
 function setTipo(t) {
   tipo = t;
   document.getElementById('optV').className = 'type-opt' + (t === 'venda' ? ' sv' : '');
   document.getElementById('optC').className = 'type-opt' + (t === 'compra' ? ' sc' : '');
+  document.getElementById('optT').className = 'type-opt' + (t === 'troca' ? ' st' : '');
+  const isTroca = t === 'troca';
+  document.getElementById('trocaFields').classList.toggle('show', isTroca);
+  document.getElementById('lblPreco').textContent = isTroca ? 'Valor de venda da troca (R$) *' : 'Preço (R$) *';
+  if (!isTroca) {
+    document.getElementById('fCusto').value = '';
+    document.getElementById('fCusto').classList.remove('err');
+    document.getElementById('eCusto').classList.remove('show');
+  }
+  atualizarLucroPreview();
 }
 
 // ─── PHOTO ───────────────────────────────────────────────────
@@ -1233,6 +1320,12 @@ document.getElementById('fNome').addEventListener('input', () => {
 document.getElementById('fPreco').addEventListener('input', () => {
   document.getElementById('fPreco').classList.remove('err');
   document.getElementById('ePreco').classList.remove('show');
+  atualizarLucroPreview();
+});
+document.getElementById('fCusto').addEventListener('input', () => {
+  document.getElementById('fCusto').classList.remove('err');
+  document.getElementById('eCusto').classList.remove('show');
+  atualizarLucroPreview();
 });
 
 // ─── PWA INSTALL HINT ────────────────────────────────────────
